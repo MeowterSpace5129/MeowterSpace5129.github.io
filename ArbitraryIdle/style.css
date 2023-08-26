@@ -1,0 +1,50 @@
+#container,
+#below_bar,
+#action_pannel{
+    display:flex;
+
+}
+html,
+body
+{
+    border-width: 0%;
+    margin:0%;
+    height: 100%;
+}
+#container{
+    background-color: lime;
+    height:100%;
+    flex-direction: column;
+}
+#top_bar
+{
+    height:4%;
+    background-color: rgb(63, 73, 82);
+    border-bottom: 2px solid rgb(29, 32, 34);
+}
+#below_bar
+{
+    flex-direction: row;
+    background-color:green;
+    height:100%
+}
+#resource_pannel
+{
+    height: 100%;
+    flex: 1;
+    background-color: rgb(40, 47, 53);
+}
+#action_pannel
+{
+    height:100%;
+    flex:2;
+    background-color: rgb(16, 18, 20);
+    border-right: 2px solid rgb(29, 32, 34);
+    border-left: 2px solid rgb(29, 32, 34);
+}
+#stage_pannel
+{
+    height:100%;
+    flex:1;
+    background-color: rgb(40, 47, 53);
+}
