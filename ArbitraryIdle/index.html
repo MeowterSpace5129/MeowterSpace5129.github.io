@@ -22,8 +22,12 @@
             <div id="below_bar">
                 <div id="resource_panel">
                     <div id="resource_panel_padding">
-                        <details open id="res_list">
-                            <summary>Basic Resources</summary>
+                        <details open id="res_list_basic">
+                            <summary class="res_list_header">Basic Resources</summary>
+                            
+                        </details>
+                        <details open id="res_list_advanced">
+                            <summary class="res_list_header">Advanced Resources</summary>
                             
                         </details>
                     </div>
@@ -31,10 +35,10 @@
                 <div id="action_panel">
                     <div class="act_row" id="act.0">
                         <div onClick="act(0,0)" class="act_item" id="act.0.0">
-                            Produce Material
+                            Produce
                             <p>
                                 <span class="orange">Cost</span> <br> Nothing <br><br>
-                                <span class="orange">Make</span> <br> 1 Material <br>
+                                <span class="orange">Make</span> <br> 1 Material <br> <br>
                             </p>
                             
                         </div>
@@ -44,7 +48,7 @@
                             Automate
                             <p>
                                 <span class="orange">Cost</span> <br> 10 Metal <br><br>
-                                <span class="orange">Make</span> <br> 1 Robot
+                                <span class="orange">Make</span> <br> 1 Robot <br> <br>
                             </p>
                         </div>
                         <div onClick="act(1,1)" class="act_item" id="act.1.1">
@@ -64,24 +68,24 @@
                     </div>
                     <div class="act_row" id="act.2">
                         <div onClick="act(2,0)" class="act_item" id="act.2.0">
-                            Automate
+                            Build Station
                             <p>
-                                <span class="orange">Cost</span> <br> 10 Metal <br><br>
-                                <span class="orange">Make</span> <br> 1 Robot <br>(+1 Material/s)
+                                <span class="orange">Cost</span> <br> 5 Compound <br> 20 Metal <br> <br>
+                                <span class="orange">Make</span> <br> 1 Station <br>
                             </p>
                         </div>
                         <div onClick="act(2,1)" class="act_item" id="act.2.1">
-                            Differentiate
+                            Refine Robot
                             <p>
-                                <span class="orange">Cost</span> <br> 5 Material <br><br>
-                                <span class="orange">Make</span> <br> 1 Metal <br> 1 Polymer
+                                <span class="orange">Cost</span> <br> 3 Robot <br><br>
+                                <span class="orange">Make</span> <br> 1 Core <br><br>
                             </p>
                         </div>
                         <div onClick="act(2,2)" class="act_item" id="act.2.2">
-                            Synergise
+                            Assemble Parts
                             <p>
-                                <span class="orange">Cost</span> <br> 5 Metal <br> 10 Polymer <br><br>
-                                <span class="orange">Make</span> <br> 1 Compound
+                                <span class="orange">Cost</span> <br> 5 Core  <br> 10 Compound <br><br>
+                                <span class="orange">Make</span> <br> 1 Part
                             </p>
                         </div>
                     </div>
