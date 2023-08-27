@@ -9,11 +9,60 @@
     </head>
     <body>
         <div id="container">
-            <div id="top_bar">top</div>
+            <div id="top_bar">
+                <h1>
+                    Arbitrary Idle
+                </h1>
+                <div id="reset" onClick="resetGame()">
+                    <b>
+                        RESET GAME
+                    </b>
+                </div>
+            </div>
             <div id="below_bar">
-                <div id="resource_pannel">res</div>
-                <div id="action_pannel">act</div>
-                <div id="stage_pannel">stage</div>
+                <div id="resource_panel">
+                    <div id="resource_panel_padding">
+                        <details open id="res_list">
+                            <summary>Basic Resources</summary>
+                            
+                        </details>
+                    </div>
+                </div>
+                <div id="action_panel">
+                    <div class="act_row" id="act.0">
+                        <div onClick="act(0,0)" class="act_item" id=" act.0.0">
+                            Produce Material
+                            <p>
+                                <span class="orange">Cost</span> <br> Nothing <br><br>
+                                <span class="orange">Make</span> <br> 1 Material <br>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="act_row" id="act.1">
+                        <div onClick="act(1,0)" class="act_item" id="act.1.0">
+                            Automate
+                            <p>
+                                <span class="orange">Cost</span> <br> 10 Metal <br><br>
+                                <span class="orange">Make</span> <br> 1 Robot <br>(+1 Material/s)
+                            </p>
+                        </div>
+                        <div onClick="act(1,1)" class="act_item" id="act.1.1">
+                            Differentiate
+                            <p>
+                                <span class="orange">Cost</span> <br> 5 Material <br><br>
+                                <span class="orange">Make</span> <br> 1 Metal <br> 1 Polymer
+                            </p>
+                        </div>
+                        <div onClick="act(1,2)" class="act_item" id="act.1.2">
+                            Synergise
+                            <p>
+                                <span class="orange">Cost</span> <br> 5 Metal <br> 10 Polymer <br><br>
+                                <span class="orange">Make</span> <br> 1 Compound
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div id="stage_panel">stage</div>
             </div>
         </div>
     </body>
