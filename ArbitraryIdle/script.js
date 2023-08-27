@@ -3,21 +3,37 @@ var saveInterval = 30*1000;
 var tickIntervalID;
 var saveIntervalID;
 var resources = {};
-var recipes = {
-    "produce_material":{cost:[{name:"none", amt:0}], make:[{name:"material", amt:1}]},
-    "automate":{cost:[{name:"metal", amt:10}], make:[{name:"robot", amt:1}]},
-    "differentiate":{cost:[{name:"material", amt:5}], make:[{name:"metal", amt:1},{name:"polymer",amt:1}]},
-    "synergize":{cost:[{name:"metal", amt:5},{name:"polymer", amt:10}], make:[{name:"compound", amt:1}]}
-}
+var caps = {};
+
+
+var robotCounts;
+var robotsInUse = 0
+var robotProgress = {};
+
 var resourceReference = ["Material", "Metal", "Polymer", "Robot", "Compound"];
+var recipeReference = ["produce_material", "automate", "differentiate", "synergize"]
+var recipeButtons = {
+    "0.0" : "produce_material",
+    "1.0" : "automate",
+    "1.1" : "differentiate",
+    "1.2" : "synergize"
+}
+var recipes = {
+    "produce_material":{cost:[{name:"none", amt:0}], make:[{name:"material", amt:1}], time:1},
+    "automate":{cost:[{name:"metal", amt:10}], make:[{name:"robot", amt:1}], time:30},
+    "differentiate":{cost:[{name:"material", amt:5}], make:[{name:"metal", amt:1},{name:"polymer",amt:1}], time:5},
+    "synergize":{cost:[{name:"metal", amt:5},{name:"polymer", amt:10}], make:[{name:"compound", amt:1}], time:10}
+}
+
 window.addEventListener("load", (event) => {
     start()
   });
 function start()
 {
     setupResList()
+    calculateCaps()
+    initializeRobots()
     gameLoad()
-
     tickIntervalID = setInterval(tick, tickInterval);
     saveIntervalID = setInterval(save, saveInterval);
 }
@@ -34,29 +50,91 @@ function setupResList()
     }
 
 }
+function calculateCaps()
+{
+    caps["material"] = 100
+    caps["metal"] = 50
+    caps["polymer"] = 50
+    caps["robot"] = 5
+    caps["compound"] = 10
+}
+function initializeRobots()
+{
+    for(i=0;i<recipeReference.length;i++)
+    {
+        robotProgress[recipeReference[i]] = 0
+        var buttonid = getKeyByValue(recipeButtons, recipeReference[i])
+        var buttonidcomma = buttonid.replace(".", ",")
+        
+        objectHTML = `<div class="robot_menu" id="robot.${buttonid}">
+        <div class="robot_minus" id="robot.${buttonid}.0" onclick="robot(event, ${buttonidcomma},0)">
+            &#45;
+        </div>
+        <div class="robot_label" id="robot.${buttonid}.1"> 
+            <div class="robot_label_text" id="robot_label_text.${buttonid}"> 0 </div> 
+            <div class="robot_label_bar" id="robot_label_bar.${buttonid}"></div> 
+        </div>
+        <div class="robot_plus" id="robot.${buttonid}.2" onclick="robot(event, ${buttonidcomma},1)">
+            &#43;
+        </div>
+    </div>`
+        console.log(buttonid)
+        document.getElementById("act." + buttonid).insertAdjacentHTML("beforeend", objectHTML)
+    }
+
+}
 function gameLoad()
 {
     var lsResources = localStorage.getItem("resources")
-    console.log(lsResources)
     if(lsResources == undefined || lsResources == null)
     {
         lsResources = "{}";
     }
-    console.log(lsResources)
     resources = JSON.parse(lsResources);
+
+    var lsRobots = localStorage.getItem("robots")
+    if(lsRobots == undefined || lsRobots == null)
+    {
+        robotCounts = {}
+        for(i=0;i<recipeReference.length;i++)
+        {
+            robotCounts[recipeReference[i]] = 0
+        }
+    }
+    else
+    {
+        robotCounts = JSON.parse(lsRobots);
+    }
+    
+    var lsRobotsInUse = localStorage.getItem("robotsInUse")
+    if(lsRobotsInUse == undefined || lsRobotsInUse == null)
+    {
+        robotsInUse = 0;
+    }
+    else
+    {
+        robotsInUse = JSON.parse(lsRobotsInUse);
+    }
+}
+function save()
+{
+    localStorage.setItem("resources", JSON.stringify(resources))
+    localStorage.setItem("robotsInUse", JSON.stringify(robotsInUse))
+    localStorage.setItem("robots", JSON.stringify(robotCounts))
 }
 function tick()
 {
     updateDisplay()
-    incResource("material", getResource("robot")/(1000/(tickInterval)))
+    for (const [key, value] of Object.entries(robotCounts)) {
+        robotProgress[key] += tickInterval/1000 * value
+        timesCompleted = Math.floor(robotProgress[key]/recipes[key].time)
+        robotProgress[key]-=recipes[key].time*timesCompleted
+        for(i=0;i<timesCompleted;i++){
+            useRecipe(key)
+        }
+    }
 }
-function save()
-{
-    console.log("saved")
-    localStorage.setItem("resources", JSON.stringify(resources))
-    lsResources = localStorage.getItem("resources")
-    console.log(lsResources)
-}
+
 function resetGame()
 {
     localStorage.clear();
@@ -68,31 +146,34 @@ function updateDisplay()
     {
         document.getElementById("res_"+ resourceReference[i].toLowerCase()).innerHTML = "" + resourceReference[i] + ": " + getResource(resourceReference[i].toLowerCase()).toFixed(2)
     }
+    for(i=0;i<recipeReference.length;i++)
+    {
+        var thisRecipe = recipeReference[i]
+        var buttonid = getKeyByValue(recipeButtons, thisRecipe)
+        if(Math.random()<0.001)
+        {
+            console.log(buttonid)
+
+        }
+        document.getElementById("robot_label_text." + buttonid).innerHTML = robotCounts[recipeReference[i]];
+        barmaxwidth = document.getElementById("robot." + buttonid + ".1").offsetWidth
+        document.getElementById("robot_label_bar." + buttonid).style.width = (robotProgress[thisRecipe]/recipes[thisRecipe].time) * barmaxwidth + "px"
+
+
+    }
+
 }
 function act(row, col)
 {
-    if(row==0&&col==0)
-    {
-        useRecipe("produce_material")
-    }
-    if(row==1&&col==0)
-    {
-        useRecipe("automate")
-    }
-    if(row==1&&col==1)
-    {
-        useRecipe("differentiate")
-    }
-    if(row==1&&col==2)
-    {
-        useRecipe("synergize")
-    }
+    useRecipe(recipeButtons["" + row + "." + col])
     updateDisplay();
 }
 function useRecipe(name)
 {
-    thisRecipe = recipes[name];
-    canAfford = true
+    console.log(name)
+    var thisRecipe = recipes[name];
+    var canAfford = true
+    var canStore = true
     for(i=0;i<thisRecipe.cost.length;i++)
     {
         thisResource = thisRecipe.cost[i]
@@ -101,6 +182,16 @@ function useRecipe(name)
             continue;
         }
         canAfford = false;
+        break;
+    }
+    for(i=0;i<thisRecipe.make.length;i++)
+    {
+        thisResource = thisRecipe.make[i]
+        if(canStoreResource(thisResource.name, thisResource.amt))
+        {
+            continue;
+        }
+        canStore = false;
         break;
     }
     if(canAfford)
@@ -130,6 +221,19 @@ function getResource(name)
     }
     return resources[name];
 }
+function getCap(name)
+{
+    if(caps[name]==undefined)
+    {
+        caps[name] = 0;
+    }
+    if(caps[name] < 0)
+    {
+        caps[name] = 0;
+    }
+    return caps[name];
+
+}
 function setResource(name, amt)
 {
     resources[name] = amt;
@@ -151,4 +255,31 @@ function canBuyResource(name, amt)
     }
     return true;
 
+}
+function canStoreResource(name, amt)
+{
+    if(getCap(name)-getResource(name)<amt)
+    {
+        return true;
+    }
+    return false;
+}
+function robot(event, row, col, num)
+{
+    event.stopPropagation()
+    console.log(`robot! ${row}, ${col}, ${num}`)
+    recipeName = recipeButtons["" + row + "." + col]
+    if(num==0&&robotCounts[recipeName] > 0){
+        robotCounts[recipeName] -= 1;
+        robotsInUse -=1;
+    }
+    if(num==1&&getResource("robot")>robotsInUse)
+    {
+        robotsInUse += 1
+        robotCounts[recipeName] +=1
+
+    }
+}
+function getKeyByValue(object, value) {
+    return Object.keys(object).find(key => object[key] === value);
 }

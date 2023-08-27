@@ -99,3 +99,51 @@ h1
     border: 2px solid rgb(16, 18, 20);
     text-align: center;
 }
+.robot_menu
+{
+    height:10%;
+    background-color: rgb(70, 81, 90);
+    display:flex;
+}
+.robot_minus
+{
+    background-color: darkred;
+    flex:1;
+    border: 1px solid rgb(36, 4, 4);
+}
+.robot_minus,
+.robot_plus,
+.robot_menu
+{
+    border-radius: 5px;
+
+}
+.robot_label_text,
+.robot_label_bar
+{
+    grid-column: 1;
+    grid-row:1;
+}
+.robot_label_bar
+{
+    background-color: rgb(24, 88, 124);
+    z-index: 1;
+}
+.robot_label_text
+{
+    z-index: 2;
+}
+.robot_label
+{
+
+    flex:8;
+    align-content: center;
+    
+    display: grid;
+}
+.robot_plus
+{
+    background-color: darkgreen;
+    flex:1;
+    border:1px solid rgb(12, 46, 12)
+}
