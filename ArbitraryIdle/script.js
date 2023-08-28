@@ -10,30 +10,56 @@ var robotCounts;
 var robotsInUse = 0
 var robotProgress = {};
 
-var resourceReference = {basic:["Material", "Metal", "Polymer", "Robot", "Compound"], advanced:["Station", "Core", "Part"]};
-var recipeReference = ["produce", "automate", "differentiate", "synergize", "build station", "refine robot", "assemble parts"]
+var resourceReference = {
+    basic:["Material", "Metal", "Polymer", "Robot", "Compound"], 
+    advanced:["Station", "Core", "Part", "Interconnect", "Enhancement", "Pylon"]};
+
+var recipeReference = [
+    "produce",
+    "automate", "differentiate", "synergize",
+    "build station", "refine robot", "assemble parts", 
+    "connect stations", "enhance robots", "construct pylon"]
+
 var recipeButtons = {
     "0.0" : "produce",
+
     "1.0" : "automate",
     "1.1" : "differentiate",
     "1.2" : "synergize",
+
     "2.0" : "build station",
     "2.1" : "refine robot",
     "2.2" : "assemble parts",
+
+    "3.0" : "connect stations",
+    "3.1" : "enhance robots",
+    "3.2" : "construct pylon"
 }
 var recipes = {
     "produce" : {cost:[{name:"none", amt:0}], make:[{name:"material", amt:1}], time:1},
     "automate" : {cost:[{name:"metal", amt:10}], make:[{name:"robot", amt:1}], time:15},
     "differentiate" : {cost:[{name:"material", amt:5}], make:[{name:"metal", amt:1},{name:"polymer",amt:1}], time:5},
     "synergize" : {cost:[{name:"metal", amt:5},{name:"polymer", amt:10}], make:[{name:"compound", amt:1}], time:10},
-    "build station": {cost:[{name:"compound", amt:5}, {name:"metal", amt:20}], make:[{name:"station", amt:1}], time: 60},
-    "refine robot" : {cost:[{name:"robot", amt:3}], make:[{name:"core", amt:1}], time: 5},
-    "assemble parts" : {cost:[{name:"core", amt:5}], make:[{name:"part", amt:1}], time:20}
+    "build station": {cost:[{name:"compound", amt:5}, {name:"metal", amt:20}], make:[{name:"station", amt:1}], time: 30},
+    "refine robot" : {cost:[{name:"robot", amt:3}], make:[{name:"core", amt:1}], time: 10},
+    "assemble parts" : {cost:[{name:"core", amt:5}, {name:"compound", amt:30}], make:[{name:"part", amt:1}], time:20},
+    "connect stations" : {cost:[{name:"part", amt:2}, {name:"station", amt:2}], make:[{name:"interconnect", amt:1}], time: 60},
+    "enhance robots" : {cost:[{name:"core", amt:1}], make:[{name:"enhancement", amt:1}], time:30},
+    "construct pylon" : {cost:[{name:"part", amt:500}], make:[{name:"pylon", amt:1}], time: 30}
+}
+var capBuffers = 
+{
+    "station" : [{name:"robot", amt:1}],
+    "interconnect" : [{name:"station", amt:1}]
 }
 
 window.addEventListener("load", (event) => {
     start()
   });
+window.addEventListener("beforeunload", (event) => {
+    document.getElementById("action_panel").scrollTo(0,0)
+});
+  
 function start()
 {
     setupResList()
@@ -45,33 +71,43 @@ function start()
 }
 function setupResList()
 {
-    resListElement = document.getElementById("res_list_basic")
+    resListElement = document.getElementById("res_list_basic");
     for(i=0;i<resourceReference.basic.length;i++)
     {
-        node = document.createElement("div")
-        node.setAttribute("class", "res_label")
-        node.setAttribute("id", "res_"+resourceReference.basic[i].toLowerCase())
+        node = document.createElement("div");
+        node.setAttribute("class", "res_label");
+        node.setAttribute("id", "res_"+resourceReference.basic[i].toLowerCase());
         resListElement.appendChild(node)
     }
-    resListElement = document.getElementById("res_list_advanced")
+    resListElement = document.getElementById("res_list_advanced");
     for(i=0;i<resourceReference.advanced.length;i++)
     {
-        node = document.createElement("div")
-        node.setAttribute("class", "res_label")
-        node.setAttribute("id", "res_"+resourceReference.advanced[i].toLowerCase())
-        resListElement.appendChild(node)
+        node = document.createElement("div");
+        node.setAttribute("class", "res_label");
+        node.setAttribute("id", "res_"+resourceReference.advanced[i].toLowerCase());
+        resListElement.appendChild(node);
     }
 
 }
 function calculateCaps()
 {
-    caps["material"] = 100
-    caps["metal"] = 50
-    caps["polymer"] = 50
-    caps["robot"] = 5 + getResource("station")
-    caps["compound"] = 10
-    caps["station"] = 5
-    caps["core"] = 500
+    caps["material"] = 100;
+    caps["metal"] = 50;
+    caps["polymer"] = 50;
+    caps["robot"] = 5;
+    caps["compound"] = 50;
+    caps["station"] = 10;
+    caps["core"] = 50;
+    caps["part"] = 100;
+    caps["interconnect"] = 20;
+    caps["enhancement"] = 20;
+    for( const [key,value] of Object.entries(capBuffers))
+    {
+        for(i=0;i<value.length;i++)
+        {
+            caps[value[i].name] += value[i].amt * getResource(key);
+        }
+    }
 
 }
 function initializeRobots()
@@ -94,7 +130,6 @@ function initializeRobots()
             &#43;
         </div>
     </div>`
-        console.log(buttonid)
         document.getElementById("act." + buttonid).insertAdjacentHTML("beforeend", objectHTML)
     }
 
@@ -142,7 +177,7 @@ function tick()
 {
     updateDisplay()
     for (const [key, value] of Object.entries(robotCounts)) {
-        robotProgress[key] += tickInterval/1000 * value
+        robotProgress[key] += tickInterval/1000 * value * (1 + ( getResource("enhancement") * 0.25))
         timesCompleted = Math.floor(robotProgress[key]/recipes[key].time)
         robotProgress[key]-=recipes[key].time*timesCompleted
         for(i=0;i<timesCompleted;i++){
@@ -184,11 +219,7 @@ function updateDisplay()
     {
         var thisRecipe = recipeReference[i]
         var buttonid = getKeyByValue(recipeButtons, thisRecipe)
-        if(Math.random()<0.001)
-        {
-            console.log(buttonid)
-
-        }
+       
         document.getElementById("robot_label_text." + buttonid).innerHTML = robotCounts[recipeReference[i]];
         barmaxwidth = document.getElementById("robot." + buttonid + ".1").offsetWidth;
         document.getElementById("robot_label_bar." + buttonid).style.width = (robotProgress[thisRecipe]/recipes[thisRecipe].time) * barmaxwidth + "px";
@@ -308,7 +339,6 @@ function canStoreResource(name, amt)
 function robot(event, row, col, num)
 {
     event.stopPropagation()
-    console.log(`robot! ${row}, ${col}, ${num}`)
     recipeName = recipeButtons["" + row + "." + col]
     if(num==0&&robotCounts[recipeName] > 0){
         robotCounts[recipeName] -= 1;
