@@ -91,13 +91,12 @@ h1
     border-radius:1%;
     justify-content: space-around;
     align-items: center;
-    min-height: 28%;
     margin: 10px;
 }
 .act_item
 {
     background-color: rgb(34, 34, 34);
-    height:90%;
+    margin: 1%;
     width:30%;
     max-width:200px;
     flex: 1;

@@ -101,6 +101,7 @@ function calculateCaps()
     caps["part"] = 100;
     caps["interconnect"] = 20;
     caps["enhancement"] = 20;
+    caps["pylon"] = 1;
     for( const [key,value] of Object.entries(capBuffers))
     {
         for(i=0;i<value.length;i++)
@@ -184,6 +185,7 @@ function tick()
             useRecipe(key)
         }
     }
+    calculateCaps();
 }
 
 function resetGame()
@@ -230,8 +232,29 @@ function updateDisplay()
 }
 function act(row, col)
 {
-    useRecipe(recipeButtons["" + row + "." + col]);
+    var buttonid = row + "." + col;
+    if(!useRecipe(recipeButtons["" + row + "." + col]))
+    {
+        buttonAlert(buttonid, 2)
+    }
     updateDisplay();
+}
+function buttonAlert(id, num)
+{
+    if(num==0)
+    {
+        return;
+    }
+    if(num%2==0)
+    {
+        document.getElementById("act."+ id).style.borderColor = "red"
+    }
+    else
+    {
+        document.getElementById("act."+ id).style.borderColor = ""
+    }
+    setTimeout(function() {buttonAlert(id, num-1)}, 100)
+
 }
 function useRecipe(name)
 {
@@ -270,7 +293,13 @@ function useRecipe(name)
             incResource(thisResource.name, thisResource.amt);
         }
     }
+    else
+    {
+        calculateCaps();
+        return false;
+    }
     calculateCaps();
+    return true;
 }
 function getResource(name)
 {
@@ -323,8 +352,12 @@ function canBuyResource(name, amt)
     if(name=="robot"&&getResource(name)-robotsInUse<amt)
     {
         return false
-
     }
+    if(name=="station"&&getResource(name)-robotsInUse<amt)
+    {
+        return false
+    }
+
     return true;
 
 }
