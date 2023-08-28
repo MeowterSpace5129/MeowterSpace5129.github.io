@@ -9,16 +9,18 @@ var caps = {};
 var robotCounts;
 var robotsInUse = 0
 var robotProgress = {};
+var tierRefence = ["basic", "advanced"]
 
 var resourceReference = {
     basic:["Material", "Metal", "Polymer", "Robot", "Compound"], 
-    advanced:["Station", "Core", "Part", "Interconnect", "Enhancement", "Pylon"]};
+    advanced:["Station", "Core", "Part", "Interconnect", "Enhancement", "Upgrade", "Pylon"]};
 
 var recipeReference = [
     "produce",
     "automate", "differentiate", "synergize",
     "build station", "refine robot", "assemble parts", 
-    "connect stations", "enhance robots", "construct pylon"]
+    "connect stations", "enhance productivity", "upgrade robots",
+    "construct pylon"]
 
 var recipeButtons = {
     "0.0" : "produce",
@@ -32,8 +34,10 @@ var recipeButtons = {
     "2.2" : "assemble parts",
 
     "3.0" : "connect stations",
-    "3.1" : "enhance robots",
-    "3.2" : "construct pylon"
+    "3.1" : "enhance productivity",
+    "3.2" : "upgrade robots",
+
+    "4.0" : "construct pylon"
 }
 var recipes = {
     "produce" : {cost:[{name:"none", amt:0}], make:[{name:"material", amt:1}], time:1},
@@ -44,7 +48,8 @@ var recipes = {
     "refine robot" : {cost:[{name:"robot", amt:3}], make:[{name:"core", amt:1}], time: 10},
     "assemble parts" : {cost:[{name:"core", amt:5}, {name:"compound", amt:30}], make:[{name:"part", amt:1}], time:20},
     "connect stations" : {cost:[{name:"part", amt:2}, {name:"station", amt:2}], make:[{name:"interconnect", amt:1}], time: 60},
-    "enhance robots" : {cost:[{name:"core", amt:1}], make:[{name:"enhancement", amt:1}], time:30},
+    "enhance productivity" : {cost:[{name:"core", amt:1}], make:[{name:"enhancement", amt:1}], time:30},
+    "upgrade robots": {cost:[{name:"enhancement", amt:5},{name:"part", amt:5}], make:[{name:"upgrade", amt:1}], time:15},
     "construct pylon" : {cost:[{name:"part", amt:500}], make:[{name:"pylon", amt:1}], time: 30}
 }
 var capBuffers = 
@@ -66,6 +71,7 @@ function start()
     calculateCaps()
     initializeRobots()
     gameLoad()
+    verifyRobotCounts()
     tickIntervalID = setInterval(tick, tickInterval);
     saveIntervalID = setInterval(save, saveInterval);
 }
@@ -98,9 +104,10 @@ function calculateCaps()
     caps["compound"] = 50;
     caps["station"] = 10;
     caps["core"] = 50;
-    caps["part"] = 100;
+    caps["part"] = 500;
     caps["interconnect"] = 20;
     caps["enhancement"] = 20;
+    caps["upgrade"] = 20
     caps["pylon"] = 1;
     for( const [key,value] of Object.entries(capBuffers))
     {
@@ -111,6 +118,7 @@ function calculateCaps()
     }
 
 }
+
 function initializeRobots()
 {
     for(i=0;i<recipeReference.length;i++)
@@ -132,6 +140,19 @@ function initializeRobots()
         </div>
     </div>`
         document.getElementById("act." + buttonid).insertAdjacentHTML("beforeend", objectHTML)
+    }
+    
+
+}
+function verifyRobotCounts()
+{
+    for(const [name, amount] of Object.entries(robotCounts))
+    {
+        if(Number.isNaN(amount) || amount == undefined)
+        {
+            robotCounts[name] = 0
+        }
+
     }
 
 }
@@ -174,18 +195,39 @@ function save()
     localStorage.setItem("robotsInUse", JSON.stringify(robotsInUse))
     localStorage.setItem("robots", JSON.stringify(robotCounts))
 }
+
 function tick()
 {
     updateDisplay()
     for (const [key, value] of Object.entries(robotCounts)) {
-        robotProgress[key] += tickInterval/1000 * value * (1 + ( getResource("enhancement") * 0.25))
+        perSecond = value * (1 + ( getResource("enhancement") * 0.25)) * Math.pow(1.15,getResource("upgrade"))
+        robotProgress[key] += tickInterval/1000 * perSecond
+        if(perSecond > 60 * recipes[key].time)
+        {
+            buttonid = getKeyByValue(recipeButtons, key)
+            barmaxwidth = document.getElementById("robot." + buttonid + ".1").offsetWidth;
+            document.getElementById("robot_label_bar." + buttonid).style.width = 1 * barmaxwidth + "px";
+        }
         timesCompleted = Math.floor(robotProgress[key]/recipes[key].time)
         robotProgress[key]-=recipes[key].time*timesCompleted
         for(i=0;i<timesCompleted;i++){
             useRecipe(key)
         }
     }
+    
     calculateCaps();
+    for (const tier of tierRefence)
+    {
+        for(const name of resourceReference[tier])
+        {
+            id = name.toLowerCase()
+            if(resources[id] > getCap(id))
+            {
+                resources[id] = getCap(id)
+            }
+        }
+
+    }
 }
 
 function resetGame()
@@ -333,10 +375,7 @@ function setResource(name, amt)
     {
         resources[name] = 0;
     }
-    if(resources[name] > getCap(name))
-    {
-        resources[name] = getCap(name)
-    }
+    
 }
 function incResource(name, dif)
 {
@@ -353,7 +392,7 @@ function canBuyResource(name, amt)
     {
         return false
     }
-    if(name=="station"&&getResource(name)-robotsInUse<amt)
+    if(name=="station"&&getCap("robot")-robotsInUse<amt)
     {
         return false
     }
