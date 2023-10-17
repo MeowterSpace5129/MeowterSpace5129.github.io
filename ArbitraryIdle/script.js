@@ -11,6 +11,7 @@ var robotsInUse = 0
 var robotProgress = {};
 var tierRefence = ["basic", "advanced"]
 
+var playerSelected = ""
 var resourceReference = {
     basic:["Material", "Metal", "Polymer", "Robot", "Compound"], 
     advanced:["Station", "Core", "Part", "Interconnect", "Enhancement", "Upgrade", "Pylon"]};
@@ -44,7 +45,7 @@ var recipes = {
     "automate" : {cost:[{name:"metal", amt:10}], make:[{name:"robot", amt:1}], time:15},
     "differentiate" : {cost:[{name:"material", amt:5}], make:[{name:"metal", amt:1},{name:"polymer",amt:1}], time:5},
     "synergize" : {cost:[{name:"metal", amt:5},{name:"polymer", amt:10}], make:[{name:"compound", amt:1}], time:10},
-    "build station": {cost:[{name:"compound", amt:5}, {name:"metal", amt:20}], make:[{name:"station", amt:1}], time: 30},
+    "build station": {cost:[{name:"compound", amt:5}, {name:"core", amt:1}], make:[{name:"station", amt:1}], time: 30},
     "refine robot" : {cost:[{name:"robot", amt:3}], make:[{name:"core", amt:1}], time: 10},
     "assemble parts" : {cost:[{name:"core", amt:5}, {name:"compound", amt:30}], make:[{name:"part", amt:1}], time:20},
     "connect stations" : {cost:[{name:"part", amt:2}, {name:"station", amt:2}], make:[{name:"interconnect", amt:1}], time: 60},
@@ -57,7 +58,6 @@ var capBuffers =
     "station" : [{name:"robot", amt:1}],
     "interconnect" : [{name:"station", amt:1}]
 }
-
 window.addEventListener("load", (event) => {
     start()
   });
@@ -200,7 +200,8 @@ function tick()
 {
     updateDisplay()
     for (const [key, value] of Object.entries(robotCounts)) {
-        perSecond = value * (1 + ( getResource("enhancement") * 0.25)) * Math.pow(1.15,getResource("upgrade"))
+        effValue = value + ( (playerSelected == key) ? 1 : 0 )
+        perSecond = effValue * (1 + ( getResource("enhancement") * 0.25)) * Math.pow(1.15,getResource("upgrade"))
         robotProgress[key] += tickInterval/1000 * perSecond
         if(perSecond > 60 * recipes[key].time)
         {
@@ -275,28 +276,22 @@ function updateDisplay()
 function act(row, col)
 {
     var buttonid = row + "." + col;
-    if(!useRecipe(recipeButtons["" + row + "." + col]))
+    if(playerSelected == recipeButtons["" + row + "." + col])
     {
-        buttonAlert(buttonid, 2)
-    }
-    updateDisplay();
-}
-function buttonAlert(id, num)
-{
-    if(num==0)
-    {
-        return;
-    }
-    if(num%2==0)
-    {
-        document.getElementById("act."+ id).style.borderColor = "red"
+        lastButton = getKeyByValue(recipeButtons, playerSelected)
+        document.getElementById("act." + lastButton).style.borderColor = ""
+        playerSelected = ""
     }
     else
     {
-        document.getElementById("act."+ id).style.borderColor = ""
+        if(playerSelected != ""){
+            lastButton = getKeyByValue(recipeButtons, playerSelected)
+            document.getElementById("act." + lastButton).style.borderColor = ""
+        }
+        document.getElementById("act." + buttonid).style.borderColor = "orange"
+        playerSelected = recipeButtons["" + row + "." + col]
     }
-    setTimeout(function() {buttonAlert(id, num-1)}, 100)
-
+    updateDisplay();
 }
 function useRecipe(name)
 {
