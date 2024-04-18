@@ -11,7 +11,6 @@ var robotsInUse = 0
 var robotProgress = {};
 var tierRefence = ["basic", "advanced"]
 
-var playerSelected = ""
 var resourceReference = {
     basic:["Material", "Metal", "Polymer", "Robot", "Compound"], 
     advanced:["Station", "Core", "Part", "Interconnect", "Enhancement", "Upgrade", "Pylon"]};
@@ -276,21 +275,7 @@ function updateDisplay()
 function act(row, col)
 {
     var buttonid = row + "." + col;
-    if(playerSelected == recipeButtons["" + row + "." + col])
-    {
-        lastButton = getKeyByValue(recipeButtons, playerSelected)
-        document.getElementById("act." + lastButton).style.borderColor = ""
-        playerSelected = ""
-    }
-    else
-    {
-        if(playerSelected != ""){
-            lastButton = getKeyByValue(recipeButtons, playerSelected)
-            document.getElementById("act." + lastButton).style.borderColor = ""
-        }
-        document.getElementById("act." + buttonid).style.borderColor = "orange"
-        playerSelected = recipeButtons["" + row + "." + col]
-    }
+    useRecipe(recipeButtons[buttonid])
     updateDisplay();
 }
 function useRecipe(name)

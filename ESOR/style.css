@@ -1,0 +1,96 @@
+#Panel_Coolant
+{
+    grid-area: cool
+}
+#Panel_Core
+{
+    grid-area: core
+}
+#Panel_Image
+{
+    grid-area: img
+}
+#Panel_Shield
+{
+    grid-area: shie
+}
+#Panel_Lasers
+{
+    grid-area: lasr
+}
+#Panel_Composition
+{
+    grid-area: comp
+}
+#Panel_Saturation
+{
+    grid-area: sat
+}
+#Panel_Bindings
+{
+    grid-area: bind
+}
+#Panel_Terminal
+{
+    grid-area: term
+}
+#Panel_Graphs
+{
+    grid-area: gra
+}
+.Panel
+{
+    background-color: rgb(85, 93, 97);
+    text-align: center;
+    padding: 20px 0;
+    font-size: 18px;
+    overflow: hidden;
+}
+#Panel_Image
+{
+    padding: 0%;
+}
+.grid-container {
+    display: grid;
+    grid-template-areas:
+        'cool core img   img  shie lasr'
+        'comp comp img   img  sat  sat'
+        'bind bind term  term gra  gra';
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 5px;
+    background-color: #1e2429;
+    
+    height: 100%;
+}
+
+html, body
+{
+    margin: 0;
+    height: 100%;
+}
+#Panel_Terminal
+{
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 5fr 1fr;
+    padding: 0px;
+    font-family: monospace;
+}
+#Console
+{
+    background-color: #0f1213;
+    color: lime;
+    text-align: left;
+}
+#Input:focus {
+    outline: none;
+}
+#Input
+{
+    font-family: monospace;
+    font-size: 15pt;
+    color: lime;
+    background-color: #1f2024;
+    border: 1px solid #787b7e;
+}
