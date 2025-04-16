@@ -199,7 +199,7 @@ function tick()
 {
     updateDisplay()
     for (const [key, value] of Object.entries(robotCounts)) {
-        effValue = value + ( (playerSelected == key) ? 1 : 0 )
+        effValue = value
         perSecond = effValue * (1 + ( getResource("enhancement") * 0.25)) * Math.pow(1.15,getResource("upgrade"))
         robotProgress[key] += tickInterval/1000 * perSecond
         if(perSecond > 60 * recipes[key].time)
