@@ -3,7 +3,7 @@ import * as fs from 'node:fs'
 console.log("hello Docker, Server Speaking")
 
 
-var batch_size = 1000;
+var batch_size = 100000;
 var founds = [];
 var highest_sent_number = 1;
 
