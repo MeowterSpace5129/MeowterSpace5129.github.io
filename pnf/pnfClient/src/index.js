@@ -1,7 +1,8 @@
 const net = require('node:net');
 const readline = require('node:readline');
 const fs = require('node:fs');
-var address = "localhost";
+
+var address = fs.readFileSync("address")
 setInterval(()=>{}, 1000);
 console.log("hello Docker, Client Speaking")
 
