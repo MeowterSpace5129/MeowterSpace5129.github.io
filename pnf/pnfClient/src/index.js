@@ -57,5 +57,5 @@ function findPrimes(data) {
       socket.write("F " + to_check);
     }
   }
-  //requestTask()
+  requestTask()
 }
