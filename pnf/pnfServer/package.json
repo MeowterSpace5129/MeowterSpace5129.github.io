@@ -1,0 +1,11 @@
+{
+  "name": "pnf-server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "test": "jest",
+    "dev": "nodemon --inspect=0.0.0.0:9229 -L src/index.js"
+  }
+}
