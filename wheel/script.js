@@ -64,7 +64,16 @@ window.addEventListener("load", (event)=>{
 
 var is_socket_open = false;
 var websocket_session_id;
-function websocket() {
+async function websocket() {
+    var response = await fetch("https://id.twitch.tv/oauth2/validate", {
+		method:"get",
+		headers:{
+            "Authorization" : "OAuth " + access_token
+        },
+	})
+    var data = await response.json();
+    user = data.user_id
+
     socket = new WebSocket("wss://eventsub.wss.twitch.tv/ws");
     socket.addEventListener('open', async event => {
     })
@@ -85,8 +94,8 @@ function websocket() {
                     "type": "channel.chat.message",
                     "version": "1",
                     "condition": {
-                        "broadcaster_user_id": 772777589,
-                        "user_id": 0,
+                        "broadcaster_user_id": "772777589",
+                        "user_id": user,
                     },
                     "transport": {
                         "method": "websocket",
