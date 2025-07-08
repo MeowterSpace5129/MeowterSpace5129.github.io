@@ -50,7 +50,7 @@ function restore() {
 window.addEventListener("load", (event)=>{
     const urlParams = new URLSearchParams(window.location.hash.substring(1))
     access_token = urlParams.get("access_token")
-    if (access_token != "") {
+    if (access_token != null) {
         localStorage.setItem("access_token", access_token)
         window.location.replace("https://meowterspace5129.github.io/wheel/index.html")
     }
