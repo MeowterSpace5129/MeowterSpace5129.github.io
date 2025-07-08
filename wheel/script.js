@@ -6,6 +6,8 @@ var isRunning = false;
 var wheel = {a:0,v:0}
 var oldnames = []
 var able_to_restore = false
+var has_token = false
+var access_token
 function appendName(name) {
     if (document.getElementById("name_" + name) != null) {
         return;
@@ -45,49 +47,63 @@ function restore() {
     oldnames.forEach(e => appendName(e))
 
 }
+window.addEventListener("load", (event)=>{
+    const urlParams = new URLSearchParams(window.location.hash.substring(1))
+    access_token = urlParams.get("access_token")
+    if (access_token != "") {
+        localStorage.setItem("access_token", access_token)
+        window.location.replace("https://meowterspace5129.github.io/wheel/index.html")
+    }
+    else if (localStorage.getItem(access_token) != null) {
+        access_token = localStorage.getItem(access_token)
+        websocket()
+    }
+
+})
+
 
 var is_socket_open = false;
 var websocket_session_id;
+function websocket() {
+    socket = new WebSocket("wss://eventsub.wss.twitch.tv/ws");
+    socket.addEventListener('open', async event => {
+    })
+    socket.addEventListener('message', async event => {
+        var message = JSON.parse(event.data)
+        if (message.metadata.message_type == "session_welcome") {
+            websocket_session_id = message.payload.session.id
+            is_socket_open = true;
 
-socket = new WebSocket("wss://eventsub.wss.twitch.tv/ws");
-socket.addEventListener('open', async event => {
-})
-socket.addEventListener('message', async event => {
-    var message = JSON.parse(event.data)
-    if (message.metadata.message_type == "session_welcome") {
-        websocket_session_id = message.payload.session.id
-        is_socket_open = true;
-
-        var response = await fetch("https://api.twitch.tv/helix/eventsub/subscriptions", {
-            method:"post",
-            headers: {
-                "Authorization": "Bearer " + user_token,
-                "Content-Type": "application/json",
-                "Client-Id": application_id
-            },
-            body:JSON.stringify({
-                "type": event_type,
-                "version": "1",
-                "condition": {
-                    "broadcaster_user_id": channel,
-                    "user_id": 0,
+            var response = await fetch("https://api.twitch.tv/helix/eventsub/subscriptions", {
+                method:"post",
+                headers: {
+                    "Authorization": "Bearer " + access_token,
+                    "Content-Type": "application/json",
+                    "Client-Id": application_id
                 },
-                "transport": {
-                    "method": "websocket",
-                    "session_id": websocket_session_id,
-                }
-            }),
-        })
-        var data = await response.json();
-    }
-    if(message.metadata.message_type =="notification") {
-        websocket_received(message.payload.event)
-    }
-})
-socket.addEventListener("close", async event => {
-    is_socket_open = false
-})
-
+                body:JSON.stringify({
+                    "type": event_type,
+                    "version": "1",
+                    "condition": {
+                        "broadcaster_user_id": channel,
+                        "user_id": 0,
+                    },
+                    "transport": {
+                        "method": "websocket",
+                        "session_id": websocket_session_id,
+                    }
+                }),
+            })
+            var data = await response.json();
+        }
+        if(message.metadata.message_type =="notification") {
+            websocket_received(message.payload.event)
+        }
+    })
+    socket.addEventListener("close", async event => {
+        is_socket_open = false
+    })
+}
 
 function websocket_received()
 {

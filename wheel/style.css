@@ -75,6 +75,9 @@ main {
     height:100%;
     color:white;
 }
+#auth_section {
+    grid-area: 4 / 1 / 5 / 2
+}
 #add_name_bar {
     border: solid #696969 2px;
     display:flex;
