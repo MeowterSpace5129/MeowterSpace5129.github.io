@@ -54,8 +54,8 @@ window.addEventListener("load", (event)=>{
         localStorage.setItem("access_token", access_token)
         window.location.replace("https://meowterspace5129.github.io/wheel/index.html")
     }
-    else if (localStorage.getItem(access_token) != null) {
-        access_token = localStorage.getItem(access_token)
+    else if (localStorage.getItem("access_token") != null) {
+        access_token = localStorage.getItem("access_token")
         websocket()
     }
 
@@ -85,7 +85,7 @@ function websocket() {
                     "type": event_type,
                     "version": "1",
                     "condition": {
-                        "broadcaster_user_id": channel,
+                        "broadcaster_user_id": "772777589",
                         "user_id": 0,
                     },
                     "transport": {
@@ -105,9 +105,12 @@ function websocket() {
     })
 }
 
-function websocket_received()
+function websocket_received(event)
 {
-
+    if (event.message.text="1")
+    {
+        appendName(event.chatter_user_name)
+    }
 }
 
 function preload()
