@@ -82,7 +82,7 @@ function websocket() {
                     "Client-Id": "xhkdzxezvzvekg0hck3kflplnj912i"
                 },
                 body:JSON.stringify({
-                    "type": event_type,
+                    "type": "channel.chat.message",
                     "version": "1",
                     "condition": {
                         "broadcaster_user_id": "772777589",
