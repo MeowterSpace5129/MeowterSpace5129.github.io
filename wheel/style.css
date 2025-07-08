@@ -67,10 +67,10 @@ main {
 }
 #names_section {
     grid-area: 2 / 3 / 5 / 4 ;
-    border: solid #696969 2px;
     width:95%;
     height:100%;
     color:white;
+    background-color: #2c2c2c;
 }
 #auth_section {
     grid-area: 4 / 1 / 5 / 2

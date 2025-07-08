@@ -116,7 +116,7 @@ async function websocket() {
 
 function websocket_received(event)
 {
-    if (event.message.text="1")
+    if (event.message.text=="1")
     {
         appendName(event.chatter_user_name)
     }
