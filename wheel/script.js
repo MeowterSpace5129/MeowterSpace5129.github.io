@@ -85,7 +85,7 @@ function websocket() {
                     "type": "channel.chat.message",
                     "version": "1",
                     "condition": {
-                        "broadcaster_user_id": "772777589",
+                        "broadcaster_user_id": 772777589,
                         "user_id": 0,
                     },
                     "transport": {
