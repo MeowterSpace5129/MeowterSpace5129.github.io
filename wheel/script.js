@@ -79,7 +79,7 @@ function websocket() {
                 headers: {
                     "Authorization": "Bearer " + access_token,
                     "Content-Type": "application/json",
-                    "Client-Id": application_id
+                    "Client-Id": "xhkdzxezvzvekg0hck3kflplnj912i"
                 },
                 body:JSON.stringify({
                     "type": event_type,
