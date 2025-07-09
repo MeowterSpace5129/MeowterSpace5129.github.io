@@ -25,10 +25,16 @@ window.addEventListener("load", (event)=>{
     if (access_token != null) {
         localStorage.setItem("access_token", access_token)
         window.location.replace("https://meowterspace5129.github.io/wheel/index.html")
-    }
-    else if (localStorage.getItem("access_token") != null) {
+    } else if (localStorage.getItem("access_token") != null) {
         access_token = localStorage.getItem("access_token")
+        document.getElementById("generate_box").style.display = "none"
+        document.getElementById("generate_button").style.display = "none"
         websocket()
+    } else {
+        
+        document.getElementById("start_button").style.display = "none"
+        document.getElementById("reset_button").style.display = "none"
+        document.getElementById("restore_button").style.display = "none"
     }
 
 })
@@ -76,6 +82,10 @@ async function websocket() {
                 }),
             })
             var data = await response.json();
+            if (data.error == "Unauthorized") {
+                localStorage.removeItem("access_token")
+                window.location.replace("https://meowterspace5129.github.io/wheel/index.html")
+            }
         }
         if(message.metadata.message_type =="notification") {
             websocket_received(message.payload.event)

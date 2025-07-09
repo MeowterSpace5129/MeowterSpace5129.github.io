@@ -93,6 +93,24 @@ main {
 #restore_button:active {
     background-color: rgb(117, 117, 0);
 }
+#generate_button {
+    border-color: rgb(0, 177, 177);
+    color:rgb(0, 177, 177);
+    height: 100%;
+    width:100%;
+}
+#generate_button:hover {
+    background-color: rgb(0, 95, 95);
+}
+#generate:active {
+    background-color: rgb(0, 65, 65);
+}
+#generate_box {
+    grid-area: 2 / 1 / 4 / 3;
+    height: 95%;
+    width:95%;
+    border:0px;
+}
 #names_section {
     grid-area: 2 / 3 / 5 / 4 ;
     width:100%;
