@@ -1,4 +1,5 @@
 var names = []
+var banned_names = []
 var canvas
 var wheel_section
 var colors = {}
@@ -12,55 +13,11 @@ var wheel = {a:0,v:0,
 
 }
 var oldnames = []
+var old_banned_names = []
 var able_to_restore = false
 var has_token = false
 var access_token
-function appendName(name) {
-    if (document.getElementById("name_" + name) != null || name == null || name=="") {
-        return;
-    }
-    if (colors[name] == null) {
-        colorMode(HSB)
-        var this_color = color(random()*512, 100, 100)
-        colors[name] = ["grid", this_color, this_color]
-        colorMode(RGB)
 
-    }
-    names.push(name)
-    document.getElementById("names_section").innerHTML+=
-                    "<div class=\"name\" id=\"name_"+name+"\">\n" +
-                    "   " + name + "\n" +
-                    "   <button onClick=\"removeName(&quot;"+name+"&quot;)\"> X </button>\n"+
-                    "</div>"
-                    
-}
-function removeName(name) {
-    document.getElementById("name_" + name).remove();
-    names.splice(names.indexOf(name),1);
-}
-function addCustomName() {
-    if (document.getElementById("add_name_input").value=="") return;
-    appendName(document.getElementById("add_name_input").value)
-    document.getElementById("add_name_input").value = ""
-}
-function start() {
-    if (isRunning) return;
-    isRunning = true;
-    if (names.length == 0) return;
-    document.getElementById("start_button").style.backgroundColor="darkgreen"
-    document.getElementById("winner_name").innerHTML = ""
-    wheel.v=wheel.launch_speed
-    wheel.a=Math.random()*PI*2
-}
-function reset() {
-    oldnames = [...names]
-    oldnames.forEach(e => removeName(e))
-    able_to_restore = true
-}
-function restore() {
-    oldnames.forEach(e => appendName(e))
-
-}
 window.addEventListener("load", (event)=>{
     const urlParams = new URLSearchParams(window.location.hash.substring(1))
     access_token = urlParams.get("access_token")
@@ -127,6 +84,15 @@ async function websocket() {
         is_socket_open = false
     })
 }
+function websocket_received(event)
+{
+    if (event.message.text=="1")
+    {
+        if(banned_names.indexOf(event.chatter_user_name)==-1)
+        appendName(event.chatter_user_name)
+        banned_names.push(event.chatter_user_name)
+    }
+}
 p5.Image.prototype.resizeNN = function (w, h) {
   "use strict";
 
@@ -170,12 +136,65 @@ p5.Image.prototype.resizeNN = function (w, h) {
 
   return this;
 };
-function websocket_received(event)
-{
-    if (event.message.text=="1")
-    {
-        appendName(event.chatter_user_name)
+function appendName(name) {
+    if (document.getElementById("name_" + name) != null || name == null || name=="") {
+        return;
     }
+    if (colors[name] == null) {
+        colorMode(HSB)
+        var this_color = color(random()*512, 100, 100)
+        colors[name] = ["grid", this_color, this_color]
+        colorMode(RGB)
+
+    }
+    names.push(name)
+    document.getElementById("names_section").innerHTML+=
+                    "<div class=\"name\" id=\"name_"+name+"\">\n" +
+                    "   " + name + "\n" +
+                    "   <button onClick=\"removeName(&quot;"+name+"&quot;)\"> X </button>\n"+
+                    "</div>"
+                    
+}
+function removeName(name) {
+    document.getElementById("name_" + name).remove();
+    names.splice(names.indexOf(name),1);
+}
+function addCustomName() {
+    if (document.getElementById("add_name_input").value=="") return;
+    appendName(document.getElementById("add_name_input").value)
+    document.getElementById("add_name_input").value = ""
+}
+function start() {
+    if (isRunning) return;
+    isRunning = true;
+    if (names.length == 0) return;
+    document.getElementById("start_button").style.backgroundColor="darkgreen"
+    document.getElementById("winner_name").innerHTML = ""
+    wheel.v=wheel.launch_speed
+    wheel.a=Math.random()*PI*2
+}
+function reset() {
+    oldnames = [...names]
+    oldnames.forEach(e => removeName(e))
+    old_banned_names = [...banned_names]
+    banned_names = []
+    able_to_restore = true
+}
+function restore() {
+    oldnames.forEach(e => appendName(e))
+    old_banned_namess.forEach(e => banned_names.push(e))
+
+}
+function winner()
+{
+    if (names.length == 0) return;
+    var ratio = wheel.a/(PI*2)
+    var actialratio = ratio - (1/names.length/2)
+    actialratio = ((actialratio % 1 ) + 1) % 1
+    var index = names.length - 1 - Math.floor(actialratio*names.length)
+    document.getElementById("winner_name").innerHTML = names[index]
+    document.getElementById("start_button").style.backgroundColor="transparent"
+    removeName(names[index])
 }
 var img_grid
 function preload()
@@ -192,16 +211,6 @@ function setup() {
     wheel_section = document.getElementById("wheel_section")
     canvas = createCanvas(wheel_section.clientWidth, wheel_section.clientHeight + 100);
     canvas.parent(wheel_section)
-}
-function winner()
-{
-    if (names.length == 0) return;
-    var ratio = wheel.a/(PI*2)
-    var actialratio = ratio - (1/names.length/2)
-    actialratio = ((actialratio % 1 ) + 1) % 1
-    var index = names.length - 1 - Math.floor(actialratio*names.length)
-    document.getElementById("winner_name").innerHTML = names[index]
-    document.getElementById("start_button").style.backgroundColor="transparent"
 }
 
 function draw() {
