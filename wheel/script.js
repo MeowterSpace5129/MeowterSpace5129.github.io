@@ -190,7 +190,6 @@ function setup() {
     wheel_section = document.getElementById("wheel_section")
     canvas = createCanvas(wheel_section.clientWidth, wheel_section.clientHeight + 100);
     canvas.parent(wheel_section)
-    img_grid.loadPixels()
 }
 function winner()
 {
@@ -226,6 +225,7 @@ function draw() {
             var template
             if (colors[names[i]][0] == "grid") {template = img_grid}
             if (colors[names[i]][0] == "uwu") {template = img_uwu}
+            template.loadPixels()
             var this_color_1 = colors[names[i]][1]
             var this_color_2 = colors[names[i]][2]
             var this_grid_img = createImage(template.width, template.height)
