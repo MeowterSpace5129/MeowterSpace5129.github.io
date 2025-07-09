@@ -124,7 +124,49 @@ async function websocket() {
         is_socket_open = false
     })
 }
+p5.Image.prototype.resizeNN = function (w, h) {
+  "use strict";
 
+  // Locally cache current image's canvas' dimension properties:
+  const { width, height } = this.canvas;
+
+  // Sanitize dimension parameters:
+  w = ~~Math.abs(w), h = ~~Math.abs(h);
+
+  // Quit prematurely if both dimensions are equal or parameters are both 0:
+  if (w === width && h === height || !(w | h))  return this;
+
+  // Scale dimension parameters:
+  if (!w)  w = h*width  / height | 0; // only when parameter w is 0
+  if (!h)  h = w*height / width  | 0; // only when parameter h is 0
+
+  const img = new p5.Image(w, h), // creates temporary image
+        sx = w / width, sy = h / height; // scaled coords. for current image
+
+  this.loadPixels(), img.loadPixels(); // initializes both 8-bit RGBa pixels[]
+
+  // Create 32-bit viewers for current & temporary 8-bit RGBa pixels[]:
+  const pixInt = new Int32Array(this.pixels.buffer),
+        imgInt = new Int32Array(img.pixels.buffer);
+
+  // Transfer current to temporary pixels[] by 4 bytes (32-bit) at once:
+  for (var x = 0, y = 0; y < h; x = 0) {
+    const curRow = width * ~~(y/sy), tgtRow = w * y++;
+
+    while (x < w) {
+      const curIdx = curRow + ~~(x/sx), tgtIdx = tgtRow + x++;
+      imgInt[tgtIdx] = pixInt[curIdx];
+    }
+  }
+
+  img.updatePixels(); // updates temp 8-bit RGBa pixels[] w/ its current state
+
+  // Resize current image to temporary image's dimensions:
+  this.canvas.width = this.width = w, this.canvas.height = this.height = h;
+  this.drawingContext.drawImage(img.canvas, 0, 0, w, h, 0, 0, w, h);
+
+  return this;
+};
 function websocket_received(event)
 {
     if (event.message.text=="1")
@@ -170,20 +212,41 @@ function draw() {
     for(var i=0;i<names.length;i++){
         strokeWeight(1/width*5)
         push()
+        /*
+        translate(width/2, height/2)
+        scale(width, height)
         
+        */
         beginClip()
         arc(0,0,0.95,0.95,(1/names.length)*PI*-1,(1/names.length)*PI,PIE)
         endClip()
 
-
-        this_grid_img = createImage(grid_img.width, grid_img.height)
+        var this_color_1 = colors[names[i]][1]
+        var this_color_2 = colors[names[i]][2]
+        var this_grid_img = createImage(grid_img.width, grid_img.height)
         this_grid_img.loadPixels()
-        this_grid_img.pixels = grid_img.pixels
-        this_grid_img.pixels.forEach((e)=>{})
-        console.log(this_grid_img.pixels[0])
+        this_grid_img.pixels.forEach((e,ind)=>{
+            if (ind%4!=0) return;
+            var this_color
+            if (grid_img.pixels[ind] == 0) {
+                this_color = this_color_1
+            } else {
+                this_color = this_color_2
+            }
+            this_grid_img.pixels[ind+0] = red(this_color)
+            this_grid_img.pixels[ind+1] = green(this_color)
+            this_grid_img.pixels[ind+2] = blue(this_color)
+            this_grid_img.pixels[ind+3] = alpha(this_color)*255
+        })
         this_grid_img.updatePixels()
-
-
+        this_grid_img.resizeNN(width, height)
+        if (random() < 0.01){
+            console.log(this_grid_img)
+        }
+        rotate(-rotated)
+        image(this_grid_img,-0.5,-0.5,1,1)
+        
+        rotate(rotated)
         pop()
         fill(0)
         strokeWeight(0)
