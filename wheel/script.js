@@ -1,19 +1,29 @@
 var names = []
 var canvas
 var wheel_section
-var colors = {}
+var colors
 var isRunning = false;
-var wheel = {a:0,v:0}
+var wheel = {a:0,v:0,
+    launch_speed:10,
+    friction:0.5,
+    friction_hard:0.9,
+    hard_threshold:0.1,
+
+}
 var oldnames = []
 var able_to_restore = false
 var has_token = false
 var access_token
 function appendName(name) {
-    if (document.getElementById("name_" + name) != null) {
+    if (document.getElementById("name_" + name) != null || name == null || name=="") {
         return;
     }
     if (colors[name] == null) {
-        colors[name] = Math.random()*255
+        colorMode(HSB)
+        var this_color = color(random()*512, 100, 100)
+        colors[name] = ["grid", this_color, this_color]
+        colorMode(RGB)
+
     }
     names.push(name)
     document.getElementById("names_section").innerHTML+=
@@ -28,14 +38,15 @@ function removeName(name) {
     names.splice(names.indexOf(name),1);
 }
 function addCustomName() {
-    if (document.getElementById("add_name_input")=="") return;
+    if (document.getElementById("add_name_input").value=="") return;
     appendName(document.getElementById("add_name_input").value)
     document.getElementById("add_name_input").value = ""
 }
 function start() {
     if (isRunning) return;
+    if (names.length == 0) return;
     isRunning = true;
-    wheel.v=0.02
+    wheel.v=wheel.launch_speed
     wheel.a=Math.random()*PI*2
 }
 function reset() {
@@ -121,25 +132,33 @@ function websocket_received(event)
         appendName(event.chatter_user_name)
     }
 }
-
+var grid_img
 function preload()
 {
-
+    grid_img = loadImage("https://meowterspace5129.github.io/wheel/assets/grid.png")
 }
 function setup() {
+    colorMode(RGB)
+    colors = {
+        "MeowterSpace5129" : ["grid", color(255,0,255), color(128,0,128)]
+    }
     wheel_section = document.getElementById("wheel_section")
     canvas = createCanvas(wheel_section.clientWidth, wheel_section.clientHeight + 100);
     canvas.parent(wheel_section)
+    grid_img.loadPixels()
 }
 function winner()
 {
+    if (names.length == 0) return;
     var ratio = wheel.a/(PI*2)
-    var actialratio = (ratio+0.25)%1
-    var index = Math.floor(actialratio*names.length)
+    var actialratio = ratio - (1/names.length/2)
+    actialratio = ((actialratio % 1 ) + 1) % 1
+    var index = names.length - 1 - Math.floor(actialratio*names.length)
     document.getElementById("winner_name").innerHTML = names[index]
 }
 
 function draw() {
+    deltaTime /= 1000
     var rotated = 0
     translate(width/2, height/2)
     scale(width, height)
@@ -149,9 +168,23 @@ function draw() {
     rotated+=wheel.a;
     rotate(wheel.a)
     for(var i=0;i<names.length;i++){
-        fill(colors[names[i]])
         strokeWeight(1/width*5)
+        push()
+        
+        beginClip()
         arc(0,0,0.95,0.95,(1/names.length)*PI*-1,(1/names.length)*PI,PIE)
+        endClip()
+
+
+        this_grid_img = createImage(grid_img.width, grid_img.height)
+        this_grid_img.loadPixels()
+        this_grid_img.pixels = grid_img.pixels
+        this_grid_img.pixels.forEach((e)=>{})
+        console.log(this_grid_img.pixels[0])
+        this_grid_img.updatePixels()
+
+
+        pop()
         fill(0)
         strokeWeight(0)
         text(names[i],0.2,0)
@@ -170,17 +203,21 @@ function draw() {
 
 
     wheel.a += wheel.v*deltaTime
-    wheel.v *= 1 - (0.001 * deltaTime)
+    
     if (wheel.a > PI*2) {
         wheel.a-=PI*2
     }
-    if(wheel.v < 0.001) {
-        wheel.v *= 1 - (0.001 * deltaTime)
+    if(wheel.v > wheel.hard_threshold) {
+        wheel.v *= 1 - (wheel.friction * deltaTime)
+    } else {
+        wheel.v *= 1 - (wheel.friction_hard * deltaTime)
     }
-    if (wheel.v < 0.00001 && isRunning) {
+    if (wheel.v < 0.01 && isRunning) {
         wheel.v = 0
         isRunning = false
-        winner()
     }
-    
+    winner()
+    if (keyIsDown(87)) {
+        wheel.a+=0.001*deltaTime;
+    }
 }
