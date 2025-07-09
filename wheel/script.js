@@ -1,13 +1,14 @@
 var names = []
 var canvas
 var wheel_section
-var colors
+var colors = {}
+var backgrounds = {}
 var isRunning = false;
 var wheel = {a:0,v:0,
     launch_speed:10,
     friction:0.5,
     friction_hard:0.9,
-    hard_threshold:0.1,
+    hard_threshold:0.5,
 
 }
 var oldnames = []
@@ -174,20 +175,22 @@ function websocket_received(event)
         appendName(event.chatter_user_name)
     }
 }
-var grid_img
+var img_grid
 function preload()
 {
-    grid_img = loadImage("https://meowterspace5129.github.io/wheel/assets/grid.png")
+    img_grid = loadImage("https://meowterspace5129.github.io/wheel/assets/grid.png")
+    img_uwu = loadImage("https://meowterspace5129.github.io/wheel/assets/uwu.png")
 }
 function setup() {
     colorMode(RGB)
     colors = {
-        "MeowterSpace5129" : ["grid", color(255,0,255), color(128,0,128)]
+        "MeowterSpace5129" : ["uwu", color(255,0,255), color(128,0,128)],
+        "ringtail216" : ["grid", color(200,200,190), color(20,20,20)]
     }
     wheel_section = document.getElementById("wheel_section")
     canvas = createCanvas(wheel_section.clientWidth, wheel_section.clientHeight + 100);
     canvas.parent(wheel_section)
-    grid_img.loadPixels()
+    img_grid.loadPixels()
 }
 function winner()
 {
@@ -203,14 +206,12 @@ function draw() {
     deltaTime /= 1000
     var rotated = 0
     translate(width/2, height/2)
-    scale(width, height)
+    scale(min(width,height),min(width,height))
+    scale(1/100,1/100)
     clear()
-    textAlign(CENTER)
-    textSize(1/width*50)
     rotated+=wheel.a;
     rotate(wheel.a)
     for(var i=0;i<names.length;i++){
-        strokeWeight(1/width*5)
         push()
         /*
         translate(width/2, height/2)
@@ -218,39 +219,56 @@ function draw() {
         
         */
         beginClip()
-        arc(0,0,0.95,0.95,(1/names.length)*PI*-1,(1/names.length)*PI,PIE)
+        arc(0,0,95,95,(1/names.length)*PI*-1,(1/names.length)*PI,PIE)
         endClip()
-
-        var this_color_1 = colors[names[i]][1]
-        var this_color_2 = colors[names[i]][2]
-        var this_grid_img = createImage(grid_img.width, grid_img.height)
-        this_grid_img.loadPixels()
-        this_grid_img.pixels.forEach((e,ind)=>{
-            if (ind%4!=0) return;
-            var this_color
-            if (grid_img.pixels[ind] == 0) {
-                this_color = this_color_1
-            } else {
-                this_color = this_color_2
-            }
-            this_grid_img.pixels[ind+0] = red(this_color)
-            this_grid_img.pixels[ind+1] = green(this_color)
-            this_grid_img.pixels[ind+2] = blue(this_color)
-            this_grid_img.pixels[ind+3] = alpha(this_color)*255
-        })
-        this_grid_img.updatePixels()
-        this_grid_img.resizeNN(width, height)
-        if (random() < 0.01){
-            console.log(this_grid_img)
+        var this_grid_img
+        if (backgrounds[[names[i]]]==null) {
+            var template
+            if (colors[names[1]][0] == "grid") {template = img_grid}
+            if (colors[names[1]][0] == "uwu") {template = img_uwu}
+            var this_color_1 = colors[names[i]][1]
+            var this_color_2 = colors[names[i]][2]
+            var this_grid_img = createImage(template.width, template.height)
+            this_grid_img.loadPixels()
+            this_grid_img.pixels.forEach((e,ind)=>{
+                if (ind%4!=0) return;
+                var this_color
+                if (template.pixels[ind] == 0) {
+                    this_color = this_color_1
+                } else {
+                    this_color = this_color_2
+                }
+                this_grid_img.pixels[ind+0] = red(this_color)
+                this_grid_img.pixels[ind+1] = green(this_color)
+                this_grid_img.pixels[ind+2] = blue(this_color)
+                this_grid_img.pixels[ind+3] = alpha(this_color)*255
+            })
+            this_grid_img.updatePixels()
+            this_grid_img.resizeNN(width, height)
+            backgrounds[names[i]] = this_grid_img;
+        } else {
+            this_grid_img = backgrounds[names[i]]
         }
+
         rotate(-rotated)
-        image(this_grid_img,-0.5,-0.5,1,1)
-        
+        image(this_grid_img,-50,-50,100,100)
         rotate(rotated)
         pop()
+
         fill(0)
-        strokeWeight(0)
-        text(names[i],0.2,0)
+        stroke(255)
+        strokeWeight(0.5)
+        strokeJoin(ROUND)
+        textAlign(RIGHT, CENTER)
+        var textlength = names[i].length
+        var textfraction = textlength/25
+        var textamount = textfraction < 0.5? 0:(textfraction-0.5)*2
+        textSize(4 - 2*textamount)
+        
+
+        text(names[i],45,0)
+
+
         rotated+=(1/names.length)*PI*2
         rotate((1/names.length)*PI*2)
     }
@@ -259,9 +277,9 @@ function draw() {
     stroke(0)
     strokeWeight(0)
     beginShape()
-    vertex(0.475,0)
-    vertex(0.5,-0.1)
-    vertex(0.5,0.1)
+    vertex(47,0)
+    vertex(50,-10)
+    vertex(50,10)
     endShape(CLOSE)
 
 
