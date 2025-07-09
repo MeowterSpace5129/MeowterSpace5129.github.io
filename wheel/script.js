@@ -224,8 +224,8 @@ function draw() {
         var this_grid_img
         if (backgrounds[[names[i]]]==null) {
             var template
-            if (colors[names[1]][0] == "grid") {template = img_grid}
-            if (colors[names[1]][0] == "uwu") {template = img_uwu}
+            if (colors[names[i]][0] == "grid") {template = img_grid}
+            if (colors[names[i]][0] == "uwu") {template = img_uwu}
             var this_color_1 = colors[names[i]][1]
             var this_color_2 = colors[names[i]][2]
             var this_grid_img = createImage(template.width, template.height)
