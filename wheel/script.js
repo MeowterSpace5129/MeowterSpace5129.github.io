@@ -18,6 +18,7 @@ var able_to_restore = false
 var has_token = false
 var access_token
 
+
 window.addEventListener("load", (event)=>{
     const urlParams = new URLSearchParams(window.location.hash.substring(1))
     access_token = urlParams.get("access_token")
@@ -86,6 +87,7 @@ async function websocket() {
 }
 function websocket_received(event)
 {
+    if (isRunning) return;
     if (event.message.text=="1")
     {
         if(banned_names.indexOf(event.chatter_user_name)==-1)
