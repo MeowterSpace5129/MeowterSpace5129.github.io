@@ -5,10 +5,10 @@ var colors = {}
 var backgrounds = {}
 var isRunning = false;
 var wheel = {a:0,v:0,
-    launch_speed:10,
-    friction:0.5,
-    friction_hard:0.9,
-    hard_threshold:0.5,
+    launch_speed:100,
+    friction:0.7,
+    friction_hard:1.6, 
+    hard_threshold:2,
 
 }
 var oldnames = []
@@ -45,8 +45,10 @@ function addCustomName() {
 }
 function start() {
     if (isRunning) return;
-    if (names.length == 0) return;
     isRunning = true;
+    if (names.length == 0) return;
+    document.getElementById("start_button").style.backgroundColor="darkgreen"
+    document.getElementById("winner_name").innerHTML = ""
     wheel.v=wheel.launch_speed
     wheel.a=Math.random()*PI*2
 }
@@ -199,6 +201,7 @@ function winner()
     actialratio = ((actialratio % 1 ) + 1) % 1
     var index = names.length - 1 - Math.floor(actialratio*names.length)
     document.getElementById("winner_name").innerHTML = names[index]
+    document.getElementById("start_button").style.backgroundColor="transparent"
 }
 
 function draw() {
@@ -296,9 +299,6 @@ function draw() {
     if (wheel.v < 0.01 && isRunning) {
         wheel.v = 0
         isRunning = false
-    }
-    winner()
-    if (keyIsDown(87)) {
-        wheel.a+=0.001*deltaTime;
+        winner()
     }
 }
