@@ -32,7 +32,7 @@ main {
 #right_section {
     display: grid;
     grid-template-columns: 0.5fr 0.5fr 1fr;
-    grid-auto-rows: 1fr 1fr 1fr 1fr 0.2fr;
+    grid-auto-rows: 1fr 1fr 1fr 1fr;
     height: 100%;
     background-color: #393939;
     display: grid;
@@ -40,7 +40,7 @@ main {
     align-items: center;
 }
 #winner_section {
-    grid-area: 1 / 1 / 2 / 4;
+    grid-area: 1 / 1 / 2 / 3;
     width:100%;
     height:100%;
     color:white;
@@ -77,10 +77,10 @@ main {
     color:red;
 }
 #reset_button:hover {
-    background-color: rgb(116, 0, 0);
+    background-color: rgb(83, 10, 10);
 }
 #reset_button:active {
-    background-color: rgb(77, 0, 0);
+    background-color: rgb(58, 10, 10);
 }
 #restore_button {
     grid-area: 3 / 2 / 4 / 3;
@@ -88,10 +88,21 @@ main {
     color:yellow;
 }
 #restore_button:hover {
-    background-color: rgb(163, 163, 0);
+    background-color: rgb(114, 114, 0);
 }
 #restore_button:active {
-    background-color: rgb(117, 117, 0);
+    background-color: rgb(61, 61, 0);
+}
+#mode_button {
+    grid-area: 4 / 1 / 5 / 2;
+    border-color: rgb(0, 0, 255);
+    color:rgb(0, 0, 255);
+}
+#mode_button:hover {
+    background-color: rgb(6, 6, 54);
+}
+#mode_button:active {
+    background-color: rgb(8, 8, 34);
 }
 #generate_button {
     border-color: rgb(0, 177, 177);

@@ -6,6 +6,7 @@
         <meta http-equiv="Expires" content="0" />
         <link rel="stylesheet" href="style.css">
         <script src="p5.js"></script>
+        <script src="angle.js"></script>
         <script src="script.js"></script>
     </head>
     <body>
@@ -26,6 +27,9 @@
                 </button>
                 <button id="restore_button" class="main_button" onClick="restore()">
                     RESTORE
+                </button>
+                <button id="mode_button" class="main_button" onClick="changeMode()", style="display: none;">
+                    MODE
                 </button>
                 <a id="generate_box" href="https://id.twitch.tv/oauth2/authorize?client_id=xhkdzxezvzvekg0hck3kflplnj912i&redirect_uri=https://meowterspace5129.github.io/wheel/index.html&response_type=token&scope=user%3Aread%3Achat">
                         <button class="main_button" id="generate_button">

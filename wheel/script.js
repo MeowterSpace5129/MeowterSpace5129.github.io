@@ -12,12 +12,23 @@ var wheel = {a:0,v:0,
     hard_threshold:2,
 
 }
+var horses = {horses:{}
+    
+}
 var oldnames = []
 var old_banned_names = []
 var able_to_restore = false
 var has_token = false
 var access_token
-
+var wheel_mode = 0
+var starting
+var border_stroke = 2
+var line_stroke = 2
+var horse_size = 2
+var horse_speed = 12
+var last_horse_angle = 0
+var last_about_angle = 0
+var last_after_angle = 0
 
 window.addEventListener("load", (event)=>{
     const urlParams = new URLSearchParams(window.location.hash.substring(1))
@@ -38,8 +49,6 @@ window.addEventListener("load", (event)=>{
     }
 
 })
-
-
 var is_socket_open = false;
 var websocket_session_id;
 async function websocket() {
@@ -178,12 +187,11 @@ function addCustomName() {
 }
 function start() {
     if (isRunning) return;
-    isRunning = true;
     if (names.length == 0) return;
+    isRunning = true;
     document.getElementById("start_button").style.backgroundColor="darkgreen"
     document.getElementById("winner_name").innerHTML = ""
-    wheel.v=wheel.launch_speed
-    wheel.a=Math.random()*PI*2
+    starting = true;
 }
 function reset() {
     oldnames = [...names]
@@ -197,16 +205,15 @@ function restore() {
     old_banned_namess.forEach(e => banned_names.push(e))
 
 }
-function winner()
+function changeMode() {
+    if (wheel_mode == 0) wheel_mode = 1
+    else wheel_mode = 0
+}
+function winner(name)
 {
-    if (names.length == 0) return;
-    var ratio = wheel.a/(PI*2)
-    var actialratio = ratio - (1/names.length/2)
-    actialratio = ((actialratio % 1 ) + 1) % 1
-    var index = names.length - 1 - Math.floor(actialratio*names.length)
-    document.getElementById("winner_name").innerHTML = names[index]
+    document.getElementById("winner_name").innerHTML = name
     document.getElementById("start_button").style.backgroundColor="transparent"
-    removeName(names[index])
+    removeName(name)
 }
 var img_grid
 function preload()
@@ -223,11 +230,60 @@ function setup() {
     wheel_section = document.getElementById("wheel_section")
     canvas = createCanvas(wheel_section.clientWidth, wheel_section.clientHeight + 100);
     canvas.parent(wheel_section)
+    horses.geometry = [
+        {type:"border", p:createVector(0,0), r:100},
+        {type:"line", p1:createVector(10,10), p2:createVector(10,-10)}
+    ]
 }
 
 function draw() {
     deltaTime /= 1000
+    deltaTime = 1/60
+    switch (wheel_mode) {
+        case 0: drawWheel(); break
+        case 1: drawHorses(); break
+    }
+}
+function createBackground(name){
+    
+    var this_bkg_img
+    if (backgrounds[name]==null) {
+        var template
+        if (colors[name][0] == "grid") {template = img_grid}
+        if (colors[name][0] == "uwu") {template = img_uwu}
+        template.loadPixels()
+        var this_color_1 = colors[name][1]
+        var this_color_2 = colors[name][2]
+        var this_bkg_img = createImage(template.width, template.height)
+        this_bkg_img.loadPixels()
+        this_bkg_img.pixels.forEach((e,ind)=>{
+            if (ind%4!=0) return;
+            var this_color
+            if (template.pixels[ind] == 0) {
+                this_color = this_color_1
+            } else {
+                this_color = this_color_2
+            }
+            this_bkg_img.pixels[ind+0] = red(this_color)
+            this_bkg_img.pixels[ind+1] = green(this_color)
+            this_bkg_img.pixels[ind+2] = blue(this_color)
+            this_bkg_img.pixels[ind+3] = alpha(this_color)*255
+        })
+        this_bkg_img.updatePixels()
+        this_bkg_img.resizeNN(width, height)
+        backgrounds[name] = this_bkg_img;
+    } else {
+        this_bkg_img = backgrounds[name]
+    }
+    return this_bkg_img
+}
+function drawWheel() {
     var rotated = 0
+    if (starting) {
+        wheel.v=wheel.launch_speed
+        wheel.a=Math.random()*PI*2
+        starting = false;
+    }
     translate(width/2, height/2)
     scale(min(width,height),min(width,height))
     scale(1/100,1/100)
@@ -236,44 +292,12 @@ function draw() {
     rotate(wheel.a)
     for(var i=0;i<names.length;i++){
         push()
-        /*
-        translate(width/2, height/2)
-        scale(width, height)
-        
-        */
         beginClip()
         arc(0,0,95,95,(1/names.length)*PI*-1,(1/names.length)*PI,PIE)
         endClip()
-        var this_grid_img
-        if (backgrounds[[names[i]]]==null) {
-            var template
-            if (colors[names[i]][0] == "grid") {template = img_grid}
-            if (colors[names[i]][0] == "uwu") {template = img_uwu}
-            template.loadPixels()
-            var this_color_1 = colors[names[i]][1]
-            var this_color_2 = colors[names[i]][2]
-            var this_grid_img = createImage(template.width, template.height)
-            this_grid_img.loadPixels()
-            this_grid_img.pixels.forEach((e,ind)=>{
-                if (ind%4!=0) return;
-                var this_color
-                if (template.pixels[ind] == 0) {
-                    this_color = this_color_1
-                } else {
-                    this_color = this_color_2
-                }
-                this_grid_img.pixels[ind+0] = red(this_color)
-                this_grid_img.pixels[ind+1] = green(this_color)
-                this_grid_img.pixels[ind+2] = blue(this_color)
-                this_grid_img.pixels[ind+3] = alpha(this_color)*255
-            })
-            this_grid_img.updatePixels()
-            this_grid_img.resizeNN(width, height)
-            backgrounds[names[i]] = this_grid_img;
-        } else {
-            this_grid_img = backgrounds[names[i]]
-        }
+        
 
+        var this_grid_img = createBackground(names[i])
         rotate(-rotated)
         image(this_grid_img,-50,-50,100,100)
         rotate(rotated)
@@ -320,6 +344,79 @@ function draw() {
     if (wheel.v < 0.01 && isRunning) {
         wheel.v = 0
         isRunning = false
-        winner()
+        var ratio = wheel.a/(PI*2)
+        var actialratio = ratio - (1/names.length/2)
+        actialratio = ((actialratio % 1 ) + 1) % 1
+        var index = names.length - 1 - Math.floor(actialratio*names.length)
+        winner(names[index])
     }
+}
+function drawHorses() {
+    translate(width/2, height/2)
+    scale(min(width,height),min(width,height))
+    scale(1/100,1/100)
+    clear()
+    
+    names.forEach(e=>{
+        if (horses.horses[e] == null)
+            horses.horses[e] = {p:createVector(0,0),v:createVector(0,0)}
+    })
+
+    if (starting) {
+        for (var horse of Object.values(horses.horses)){
+            horse.v.x=0
+            horse.v.y=17
+            horse.v.setHeading(random()*2*PI)
+        }
+        starting = false;
+    }
+
+    for(var e of horses.geometry) {
+        if(e.type == "border") {
+            stroke(0)
+            strokeWeight(border_stroke)
+            fill(57)
+            circle(e.p.x,e.p.y,e.r)
+            for(var horse of Object.values(horses.horses)){
+                if (horse.p.dist(e.p) > e.r/2 - horse_size/2 - border_stroke) {
+                    
+                    reflectHorse(horse, p5.Vector.sub(e.p,horse.p))
+                }
+            }
+        }
+        if(e.type == "line") {
+            stroke(0)
+            strokeWeight(line_stroke)
+            noFill()
+            line(e.p1.x,e.p1.y,e.p2.x,e.p2.y)
+        }
+    }
+
+    for(var i=0;i<names.length;i++){
+        this_horse = horses.horses[names[i]]
+        push()
+        beginClip()
+        translate(this_horse.p.x, this_horse.p.y)
+        beginShape()
+        vertex(1,0)
+        vertex(0,-1)
+        vertex(-2,-1)
+        vertex(-1,0)
+        vertex(-1,2)
+        vertex(0,1)
+        vertex(1,2)
+        endShape(CLOSE)
+        translate(-this_horse.p.x, -this_horse.p.y)
+        endClip()
+
+        var this_bkg_img = createBackground(names[i])
+        image(this_bkg_img,-50,-50,100,100)
+        pop()
+        this_horse.p.x+=this_horse.v.x*deltaTime
+        this_horse.p.y+=this_horse.v.y*deltaTime
+    }
+}
+function reflectHorse(horse, normal) {
+    horse.v.reflect(normal)
+    horse.v.rotate((random()*2-1)*0.1)
 }
