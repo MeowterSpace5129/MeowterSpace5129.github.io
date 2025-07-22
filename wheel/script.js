@@ -345,6 +345,9 @@ function drawWheel() {
         rotated+=(1/names.length)*PI*2
         rotate((1/names.length)*PI*2)
     }
+    
+    rotate(-rotated)
+    rotated=0
     fill(255)
     stroke(0)
     strokeWeight(0)
