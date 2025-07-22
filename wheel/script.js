@@ -163,7 +163,7 @@ function appendName(name) {
     }
     if (colors[name] == null) {
         colorMode(HSB)
-        var this_color = color(random()*512, 100, 100)
+        var this_color = color(random()*360, 100, 100)
         colors[name] = ["grid", this_color, this_color]
         colorMode(RGB)
 
@@ -302,6 +302,7 @@ function drawWheel() {
         image(this_grid_img,-50,-50,100,100)
         rotate(rotated)
         pop()
+        
 
         fill(0)
         stroke(255)
@@ -320,7 +321,30 @@ function drawWheel() {
         rotated+=(1/names.length)*PI*2
         rotate((1/names.length)*PI*2)
     }
+
     rotate(-rotated)
+    rotated=0
+    rotated+=wheel.a;
+    rotate(wheel.a)
+
+    for(var i=0;i<names.length;i++){
+        stroke(0)
+        strokeWeight(1)
+        line(0,0,cos((1/names.length)*PI)*47.5,sin((1/names.length)*PI)*47.5)
+        line(0,0,cos((1/names.length)*PI)*47.5,sin((1/names.length)*PI)*47.5)
+
+        rotated+=(1/names.length)*PI*2
+        rotate((1/names.length)*PI*2)
+    }
+    for(var i=0;i<names.length;i++){
+        stroke(255)
+        strokeWeight(0.5)
+        line(0,0,cos((1/names.length)*PI)*47.5,sin((1/names.length)*PI)*47.5)
+        line(0,0,cos((1/names.length)*PI)*47.5,sin((1/names.length)*PI)*47.5)
+
+        rotated+=(1/names.length)*PI*2
+        rotate((1/names.length)*PI*2)
+    }
     fill(255)
     stroke(0)
     strokeWeight(0)
