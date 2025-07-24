@@ -15,6 +15,7 @@ var wheel = {a:0,v:0,
 var horses = {horses:{}
     
 }
+var list = {red_names:[]}
 var oldnames = []
 var old_banned_names = []
 var able_to_restore = false
@@ -24,6 +25,7 @@ var wheel_mode = 0
 var starting
 var border_stroke = 2
 var line_stroke = 2
+var goal_stroke = 3
 var horse_size = 2
 var horse_speed = 12
 var last_horse_angle = 0
@@ -231,8 +233,24 @@ function setup() {
     canvas = createCanvas(wheel_section.clientWidth, wheel_section.clientHeight + 100);
     canvas.parent(wheel_section)
     horses.geometry = [
-        {type:"border", p:createVector(0,0), r:100},
-        {type:"line", p1:createVector(10,10), p2:createVector(10,-10)}
+        {type:"border", p:createVector(0,0), r:95},
+        {type:"line", p1:createVector(10,10), p2:createVector(10,-10)},
+
+        {type:"line", p1:createVector(-10,10), p2:createVector(-30,10)},
+        {type:"line", p1:createVector(-10,-10), p2:createVector(-30,-10)},
+        
+        {type:"line", p1:createVector(0,-25), p2:createVector(0,-35)},
+        {type:"line", p1:createVector(20,-25), p2:createVector(20,-30)},
+        {type:"line", p1:createVector(-20,-25), p2:createVector(-20,-30)},
+
+        {type:"line", p1:createVector(0,25), p2:createVector(0,35)},
+        {type:"line", p1:createVector(20,25), p2:createVector(20,30)},
+        {type:"line", p1:createVector(-20,25), p2:createVector(-20,30)},
+
+        {type:"line", p1:createVector(25,5), p2:createVector(35,15)},
+        {type:"line", p1:createVector(25,-5), p2:createVector(35,-15)},
+        
+        {type:"goal", p:createVector(40,0)}
     ]
 }
 
@@ -242,6 +260,7 @@ function draw() {
     switch (wheel_mode) {
         case 0: drawWheel(); break
         case 1: drawHorses(); break
+        case 2: drawList(); break
     }
 }
 function createBackground(name){
@@ -386,7 +405,7 @@ function drawHorses() {
     
     names.forEach(e=>{
         if (horses.horses[e] == null)
-            horses.horses[e] = {p:createVector(0,0),v:createVector(0,0)}
+            horses.horses[e] = {p:createVector(random()*2-1,random()*2-1),v:createVector(0,0), owner:e}
     })
 
     if (starting) {
@@ -400,9 +419,13 @@ function drawHorses() {
 
     for(var e of horses.geometry) {
         if(e.type == "border") {
-            stroke(0)
+            stroke(255)
+            fill(25)
             strokeWeight(border_stroke)
-            fill(57)
+            circle(e.p.x,e.p.y,e.r)
+            stroke(0)
+            noFill()
+            strokeWeight(border_stroke/2)
             circle(e.p.x,e.p.y,e.r)
             for(var horse of Object.values(horses.horses)){
                 if (horse.p.dist(e.p) > e.r/2 - horse_size/2 - border_stroke) {
@@ -412,10 +435,43 @@ function drawHorses() {
             }
         }
         if(e.type == "line") {
-            stroke(0)
+            stroke(255)
             strokeWeight(line_stroke)
             noFill()
             line(e.p1.x,e.p1.y,e.p2.x,e.p2.y)
+            strokeWeight(line_stroke/2)
+            stroke(0)
+            line(e.p1.x,e.p1.y,e.p2.x,e.p2.y)
+
+            
+            for(var horse of Object.values(horses.horses)){
+                var result = pDistance(horse.p.x,horse.p.y, e.p1.x,e.p1.y, e.p2.x,e.p2.y)
+                if (result.v < horse_size/2+line_stroke/2)
+                {
+                    if (result.p == "1"){
+                        reflectHorse(horse, p5.Vector.sub(e.p1,horse.p))
+                    } else if (result.p == "2"){
+                        reflectHorse(horse, p5.Vector.sub(e.p2,horse.p))
+                    } else {
+                        reflectHorse(horse, p5.Vector.sub(e.p1,e.p2).rotate(PI/2))
+                    }
+                }
+            }
+        }
+        if(e.type == "goal"){
+            noStroke()
+            fill(255,200,0)
+            circle(e.p.x,e.p.y,goal_stroke)
+            for(var horse of Object.values(horses.horses)){
+                if (horse.p.dist(e.p) < horse_size/2 + goal_stroke/2) {
+                    winner(horse.owner)
+                    isRunning = false
+                    for(var horse of Object.values(horses.horses)){
+                        horse.p=createVector(random()*2-1,random()*2-1)
+                        horse.v=createVector(0,0)
+                    }
+                }
+            }
         }
     }
 
@@ -424,26 +480,107 @@ function drawHorses() {
         push()
         beginClip()
         translate(this_horse.p.x, this_horse.p.y)
-        beginShape()
-        vertex(1,0)
-        vertex(0,-1)
-        vertex(-2,-1)
-        vertex(-1,0)
-        vertex(-1,2)
-        vertex(0,1)
-        vertex(1,2)
-        endShape(CLOSE)
+        drawHorse()
         translate(-this_horse.p.x, -this_horse.p.y)
         endClip()
 
         var this_bkg_img = createBackground(names[i])
         image(this_bkg_img,-50,-50,100,100)
+
+        translate(this_horse.p.x, this_horse.p.y)
+        noFill()
+        strokeWeight(0.4)
+        stroke(255)
+        drawHorse()
+
+        strokeWeight(0.2)
+        stroke(0)
+        drawHorse()
+
+        translate(-this_horse.p.x, -this_horse.p.y)
+        
         pop()
         this_horse.p.x+=this_horse.v.x*deltaTime
         this_horse.p.y+=this_horse.v.y*deltaTime
     }
 }
+function drawList() {
+    translate(width/2, height/2)
+    scale(min(width,height),min(width,height))
+    scale(1/100,1/100)
+    clear()
+
+    for(var i=0;i<names.length;i++){
+        push()
+        strokeJoin(ROUND)
+        textAlign(RIGHT, CENTER)
+        textSize(20)
+        
+        //beginClip()
+        fill(255)
+        //rect(0,0,20,20)
+        text(names[i],0,0)
+        //endClip()
+        
+        var this_grid_img = createBackground(names[i])
+        //image(this_grid_img,-50,-50,100,100)
+
+        
+        pop()
+    }
+
+
+
+}
 function reflectHorse(horse, normal) {
     horse.v.reflect(normal)
     horse.v.rotate((random()*2-1)*0.1)
+}
+function drawHorse()
+{
+    beginShape()
+    vertex(1,0)
+    vertex(0,-1)
+    vertex(-2,-1)
+    vertex(-1,0)
+    vertex(-1,2)
+    vertex(0,1)
+    vertex(1,2)
+    endShape(CLOSE)
+}
+
+function pDistance(x, y, x1, y1, x2, y2) {
+
+    var A = x - x1;
+    var B = y - y1;
+    var C = x2 - x1;
+    var D = y2 - y1;
+    var p;
+    var dot = A * C + B * D;
+    var len_sq = C * C + D * D;
+    var param = -1;
+    if (len_sq != 0) //in case of 0 length line
+        param = dot / len_sq;
+
+    var xx, yy;
+
+    if (param < 0) {
+    xx = x1;
+    yy = y1;
+    var p = "1"
+    }
+    else if (param > 1) {
+    xx = x2;
+    yy = y2;
+    var p = "2"
+    }
+    else {
+    xx = x1 + param * C;
+    yy = y1 + param * D;
+    var p = "0"
+    }
+
+    var dx = x - xx;
+    var dy = y - yy;
+    return {v:Math.sqrt(dx * dx + dy * dy),p:p};
 }
