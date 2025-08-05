@@ -111,9 +111,8 @@ function websocket_received(event)
     if (isRunning) return;
     if (event.message.text=="1")
     {
-        if(banned_names.indexOf(event.chatter_user_name)==-1)
+        if(banned_names.indexOf(event.chatter_user_name)==-1 && names.indexOf(event.chatter_user_name)==-1)
         appendName(event.chatter_user_name)
-        banned_names.push(event.chatter_user_name)
     }
 }
 p5.Image.prototype.resizeNN = function (w, h) {
@@ -215,6 +214,8 @@ function winner(name)
 {
     document.getElementById("winner_name").innerHTML = name
     document.getElementById("start_button").style.backgroundColor="transparent"
+    banned_names=[]
+    banned_names.push(name)
     removeName(name)
 }
 var img_grid
