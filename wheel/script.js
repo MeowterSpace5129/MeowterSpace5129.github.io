@@ -10,6 +10,8 @@ var wheel = {a:0,v:0,
     friction:0.7,
     friction_hard:1.6, 
     hard_threshold:2,
+    weights :{"MeowterSpace5129":0.33},
+
 
 }
 var horses = {horses:{}
@@ -31,6 +33,13 @@ var horse_speed = 12
 var last_horse_angle = 0
 var last_about_angle = 0
 var last_after_angle = 0
+
+var img_grid
+var img_uwu
+var img_ralp
+
+var totalWeight = 0
+
 
 window.addEventListener("load", (event)=>{
     const urlParams = new URLSearchParams(window.location.hash.substring(1))
@@ -178,6 +187,7 @@ function appendName(name) {
                     
 }
 function removeName(name) {
+    if (names.indexOf(name) == -1) {return}
     document.getElementById("name_" + name).remove();
     names.splice(names.indexOf(name),1);
 }
@@ -203,7 +213,7 @@ function reset() {
 }
 function restore() {
     oldnames.forEach(e => appendName(e))
-    old_banned_namess.forEach(e => banned_names.push(e))
+    old_banned_names.forEach(e => banned_names.push(e))
 
 }
 function changeMode() {
@@ -219,7 +229,6 @@ function winner(name)
     banned_names.push(name)
     removeName(name)
 }
-var img_grid
 function preload()
 {
     img_grid = loadImage("https://meowterspace5129.github.io/wheel/assets/grid.png")
@@ -258,7 +267,6 @@ function setup() {
         {type:"goal", p:createVector(40,0)}
     ]
 }
-
 function draw() {
     deltaTime /= 1000
     deltaTime = 1/60
@@ -309,16 +317,25 @@ function drawWheel() {
         wheel.a=Math.random()*PI*2
         starting = false;
     }
+    totalWeight = 0
+    names.forEach(e=>{
+        if (wheel.weights[e] == undefined){
+            wheel.weights[e] = 1;
+        }
+        totalWeight+=wheel.weights[e]
+    })
     translate(width/2, height/2)
     scale(min(width,height),min(width,height))
     scale(1/100,1/100)
     clear()
     rotated+=wheel.a;
     rotate(wheel.a)
+    
     for(var i=0;i<names.length;i++){
         push()
         beginClip()
-        arc(0,0,95,95,(1/names.length)*PI*-1,(1/names.length)*PI,PIE)
+        angle = (wheel.weights[names[i]]/totalWeight) * PI
+        arc(0,0,95,95,angle*-1,angle,PIE)
         endClip()
         
 
@@ -342,35 +359,43 @@ function drawWheel() {
 
         text(names[i],45,0)
 
-
-        rotated+=(1/names.length)*PI*2
-        rotate((1/names.length)*PI*2)
+        
+        var toRotate = ( ( wheel.weights[names[i]] + wheel.weights[names[i+1]] ) /2 /totalWeight)*PI*2
+        if(isNaN(toRotate)) {
+            toRotate = 0;
+        }
+        rotated+=toRotate
+        rotate(toRotate)
     }
 
     rotate(-rotated)
     rotated=0
     rotated+=wheel.a;
     rotate(wheel.a)
-
+/*
     for(var i=0;i<names.length;i++){
         stroke(0)
         strokeWeight(1)
-        line(0,0,cos((1/names.length)*PI)*47.5,sin((1/names.length)*PI)*47.5)
-        line(0,0,cos((1/names.length)*PI)*47.5,sin((1/names.length)*PI)*47.5)
+        angle = (wheel.weights[names[i]]/totalWeight) * PI
+        line(0,0,cos(angle)*47.5,sin(angle)*47.5)
+        line(0,0,cos(angle)*47.5,sin(angle)*47.5)
 
-        rotated+=(1/names.length)*PI*2
-        rotate((1/names.length)*PI*2)
+        toRotate = (wheel.weights[names[i]]/totalWeight)*PI*2
+        rotated+=toRotate
+        rotate(toRotate)
     }
     for(var i=0;i<names.length;i++){
         stroke(255)
         strokeWeight(0.5)
-        line(0,0,cos((1/names.length)*PI)*47.5,sin((1/names.length)*PI)*47.5)
-        line(0,0,cos((1/names.length)*PI)*47.5,sin((1/names.length)*PI)*47.5)
+        angle = (wheel.weights[names[i]]/totalWeight) * PI
+        line(0,0,cos(angle)*47.5,sin(angle)*47.5)
+        line(0,0,cos(angle)*47.5,sin(angle)*47.5)
 
-        rotated+=(1/names.length)*PI*2
-        rotate((1/names.length)*PI*2)
+        toRotate = (wheel.weights[names[i]]/totalWeight)*PI*2
+        rotated+=toRotate
+        rotate(toRotate)
     }
-    
+    */
     rotate(-rotated)
     rotated=0
     fill(255)
@@ -396,10 +421,18 @@ function drawWheel() {
     if (wheel.v < 0.01 && isRunning) {
         wheel.v = 0
         isRunning = false
-        var ratio = wheel.a/(PI*2)
-        var actialratio = ratio - (1/names.length/2)
-        actialratio = ((actialratio % 1 ) + 1) % 1
-        var index = names.length - 1 - Math.floor(actialratio*names.length)
+        var ratio = -wheel.a/(PI*2)
+        ratio = (((ratio % 1) + 1) % 1)
+        var sofar = -wheel.weights[names[0]]/totalWeight/2
+        var index = 0
+        for(var i=0;i<names.length;i++) {
+            
+            sofar += wheel.weights[names[i]]/totalWeight
+            if(ratio < sofar) {
+                index = i
+                break;
+            }
+        }
         winner(names[index])
     }
 }
