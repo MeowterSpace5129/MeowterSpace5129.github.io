@@ -10,7 +10,9 @@ var wheel = {a:0,v:0,
     friction:0.7,
     friction_hard:1.6, 
     hard_threshold:2,
-    weights :{"MeowterSpace5129":0.33},
+    weights :{
+        "MeowterSpace5129":0.33, 
+    },
 
 
 }
@@ -372,30 +374,40 @@ function drawWheel() {
     rotated=0
     rotated+=wheel.a;
     rotate(wheel.a)
-/*
     for(var i=0;i<names.length;i++){
+
         stroke(0)
         strokeWeight(1)
-        angle = (wheel.weights[names[i]]/totalWeight) * PI
-        line(0,0,cos(angle)*47.5,sin(angle)*47.5)
+        angle = (wheel.weights[names[i]]/totalWeight) * PI 
         line(0,0,cos(angle)*47.5,sin(angle)*47.5)
 
-        toRotate = (wheel.weights[names[i]]/totalWeight)*PI*2
+        var toRotate = ( ( wheel.weights[names[i]] + wheel.weights[names[i+1]] ) /2 /totalWeight)*PI*2
+        if(isNaN(toRotate)) {
+            toRotate = 0;
+        }
         rotated+=toRotate
         rotate(toRotate)
     }
+    
+    rotate(-rotated)
+    rotated=0
+    rotated+=wheel.a;
+    rotate(wheel.a)
     for(var i=0;i<names.length;i++){
         stroke(255)
         strokeWeight(0.5)
-        angle = (wheel.weights[names[i]]/totalWeight) * PI
-        line(0,0,cos(angle)*47.5,sin(angle)*47.5)
+        angle = (wheel.weights[names[i]]/totalWeight) * PI 
         line(0,0,cos(angle)*47.5,sin(angle)*47.5)
 
-        toRotate = (wheel.weights[names[i]]/totalWeight)*PI*2
+        
+        var toRotate = ( ( wheel.weights[names[i]] + wheel.weights[names[i+1]] ) /2 /totalWeight)*PI*2
+        if(isNaN(toRotate)) {
+            toRotate = 0;
+        }
         rotated+=toRotate
         rotate(toRotate)
     }
-    */
+    
     rotate(-rotated)
     rotated=0
     fill(255)
