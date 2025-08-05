@@ -222,7 +222,7 @@ function preload()
 {
     img_grid = loadImage("https://meowterspace5129.github.io/wheel/assets/grid.png")
     img_uwu = loadImage("https://meowterspace5129.github.io/wheel/assets/uwu.png")
-    img_ralp = loadImage("https://meowterspace5129.github.io/wheel/assets/ralp.png")
+    img_ralp = loadImage("https://meowterspace5129.github.io/wheel/assets/ralp.jpg")
 }
 function setup() {
     colorMode(RGB)
@@ -273,7 +273,7 @@ function createBackground(name){
         var template
         if (colors[name][0] == "grid") {template = img_grid}
         if (colors[name][0] == "uwu") {template = img_uwu}
-        if (colors[name][0] == "ralp") {template = img_ralp}
+        if (colors[name][0] == "ralp") {backgrounds[name] = img_ralp; return img_ralp}
         template.loadPixels()
         var this_color_1 = colors[name][1]
         var this_color_2 = colors[name][2]
