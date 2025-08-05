@@ -222,12 +222,15 @@ function preload()
 {
     img_grid = loadImage("https://meowterspace5129.github.io/wheel/assets/grid.png")
     img_uwu = loadImage("https://meowterspace5129.github.io/wheel/assets/uwu.png")
+    img_ralp = loadImage("https://meowterspace5129.github.io/wheel/assets/ralp.png")
 }
 function setup() {
     colorMode(RGB)
     colors = {
         "MeowterSpace5129" : ["uwu", color(255,0,255), color(128,0,128)],
-        "ringtail216" : ["grid", color(200,200,190), color(20,20,20)]
+        "ringtail216" : ["grid", color(200,200,190), color(20,20,20)],
+        "Ziggying_" : ["grid", color(237,255,0), color(237,255,0)],
+        "ralpmeTthginK96" : ["ralp", color(94, 58, 42), color(149, 130, 124)]
     }
     wheel_section = document.getElementById("wheel_section")
     canvas = createCanvas(wheel_section.clientWidth, wheel_section.clientHeight + 100);
@@ -270,6 +273,7 @@ function createBackground(name){
         var template
         if (colors[name][0] == "grid") {template = img_grid}
         if (colors[name][0] == "uwu") {template = img_uwu}
+        if (colors[name][0] == "ralp") {template = img_ralp}
         template.loadPixels()
         var this_color_1 = colors[name][1]
         var this_color_2 = colors[name][2]
