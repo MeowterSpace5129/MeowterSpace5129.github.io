@@ -238,6 +238,7 @@ function preload()
     img_uwu = loadImage("https://meowterspace5129.github.io/wheel/assets/uwu.png")
     img_ralp = loadImage("https://meowterspace5129.github.io/wheel/assets/ralp.jpg")
     img_ratt = loadImage("https://meowterspace5129.github.io/wheel/assets/ratt.png")
+}
 function setup() {
     colorMode(RGB)
     colors = {
