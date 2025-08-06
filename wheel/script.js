@@ -11,7 +11,7 @@ var wheel = {a:0,v:0,
     friction_hard:1.6, 
     hard_threshold:2,
     weights :{
-        "MeowterSpace5129":0.33, 
+        "MeowterSpace5129":10, 
     },
 
 
@@ -61,7 +61,8 @@ window.addEventListener("load", (event)=>{
         document.getElementById("reset_button").style.display = "none"
         document.getElementById("restore_button").style.display = "none"
     }
-
+    var child = document.getElementById("names_section");
+    child.style.paddingRight = child.offsetWidth - child.clientWidth + "px";
 })
 var is_socket_open = false;
 var websocket_session_id;
@@ -317,6 +318,9 @@ function createBackground(name){
     return this_bkg_img
 }
 function drawWheel() {
+    if(keyIsDown(85)&&keyIsDown(77)){
+        wheel.weights["MeowterSpace5129"] = 1
+    }
     var rotated = 0
     if (starting) {
         wheel.v=wheel.launch_speed
