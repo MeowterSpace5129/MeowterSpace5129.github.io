@@ -11,7 +11,7 @@ var wheel = {a:0,v:0,
     friction_hard:1.6, 
     hard_threshold:2,
     weights :{
-        "MeowterSpace5129":10, 
+        "MeowterSpace5129":1, 
     },
 
 
