@@ -229,8 +229,8 @@ function winner(name)
     document.getElementById("winner_name").innerHTML = name
     document.getElementById("start_button").style.backgroundColor="transparent"
     // points night control
-    //banned_names=[]
-    banned_names.push(name)
+    banned_names=[]
+    //banned_names.push(name)
     removeName(name)
 }
 function preload()
