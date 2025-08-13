@@ -35,6 +35,7 @@ var horse_speed = 12
 var last_horse_angle = 0
 var last_about_angle = 0
 var last_after_angle = 0
+var banmode = 0
 
 var img_grid
 var img_uwu
@@ -224,13 +225,22 @@ function changeMode() {
     if (wheel_mode == 0) wheel_mode = 1
     else wheel_mode = 0
 }
+function changeBan(){
+    banmode = ++banmode % 3
+}
 function winner(name)
 {
     document.getElementById("winner_name").innerHTML = name
     document.getElementById("start_button").style.backgroundColor="transparent"
     // points night control
-    banned_names=[]
-    //banned_names.push(name)
+    if(banmode == 0) {
+        banned_names.push(name)
+    } else if (banmode == 1) {
+        banned_names=[]
+        banned_names.push(name)
+    } else if (banmode == 2) {
+        banned_names=[]
+    }
     removeName(name)
 }
 function preload()
@@ -280,6 +290,13 @@ function draw() {
         case 0: drawWheel(); break
         case 1: drawHorses(); break
         case 2: drawList(); break
+    }
+    if (banmode == 0) {
+        document.getElementById("ban_mode").innerHTML = "Until Reset"
+    } else if (banmode == 1) {
+        document.getElementById("ban_mode").innerHTML = "Last Winner"
+    } else if (banmode == 2) {
+        document.getElementById("ban_mode").innerHTML = "None"
     }
 }
 function createBackground(name){

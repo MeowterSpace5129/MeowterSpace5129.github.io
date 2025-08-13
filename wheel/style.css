@@ -105,6 +105,16 @@ main {
 }
 #mode_button:active {
     background-color: rgb(8, 8, 34);
+}#ban_button {
+    grid-area: 4 / 2 / 5 / 3;
+    border-color: rgb(255, 0, 255);
+    color:rgb(255, 0, 255);
+}
+#ban_button:hover {
+    background-color: rgb(146, 0, 146);
+}
+#ban_button:active {
+    background-color: rgb(51, 0, 51);
 }
 #generate_button {
     border-color: rgb(0, 177, 177);
