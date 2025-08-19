@@ -41,6 +41,7 @@ var img_grid
 var img_uwu
 var img_ralp
 var img_ratt
+var img_tart
 
 var totalWeight = 0
 
@@ -61,6 +62,8 @@ window.addEventListener("load", (event)=>{
         document.getElementById("start_button").style.display = "none"
         document.getElementById("reset_button").style.display = "none"
         document.getElementById("restore_button").style.display = "none"
+        document.getElementById("mode_button").style.display = "none"
+        document.getElementById("ban_button").style.display = "none"
     }
     var child = document.getElementById("names_section");
     child.style.paddingRight = child.offsetWidth - child.clientWidth + "px";
@@ -249,6 +252,7 @@ function preload()
     img_uwu = loadImage("https://meowterspace5129.github.io/wheel/assets/uwu.png")
     img_ralp = loadImage("https://meowterspace5129.github.io/wheel/assets/ralp.jpg")
     img_ratt = loadImage("https://meowterspace5129.github.io/wheel/assets/ratt.png")
+    img_tart = loadImage("https://meowterspace5129.github.io/wheel/assets/tart.png")
 }
 function setup() {
     colorMode(RGB)
@@ -257,7 +261,8 @@ function setup() {
         "ringtail216" : ["grid", color(200,200,190), color(20,20,20)],
         "Ziggying_" : ["grid", color(237,255,0), color(237,255,0)],
         "ralpmeTthginK96" : ["ralp", color(94, 58, 42), color(149, 130, 124)],
-        "MetalPipeFallingSoundFX" : ["ratt", color(212, 44, 0), color(162, 1, 97)]
+        "MetalPipeFallingSoundFX" : ["ratt", color(212, 44, 0), color(162, 1, 97)],
+        "ufomothman" : ["tart", color(255,0,255), color(0,255,255)]
     }
     wheel_section = document.getElementById("wheel_section")
     canvas = createCanvas(wheel_section.clientWidth, wheel_section.clientHeight + 100);
@@ -306,6 +311,7 @@ function createBackground(name){
         var template
         if (colors[name][0] == "grid") {template = img_grid}
         if (colors[name][0] == "uwu") {template = img_uwu}
+        if (colors[name][0] == "tart") {template = img_tart}
         if (colors[name][0] == "ralp") {backgrounds[name] = img_ralp; return img_ralp}
         if (colors[name][0] == "ratt") {backgrounds[name] = img_ratt; return img_ratt}
         template.loadPixels()
