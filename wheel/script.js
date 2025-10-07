@@ -11,7 +11,10 @@ var wheel = {a:0,v:0,
     friction_hard:1.6, 
     hard_threshold:2,
     weights :{
-        "MeowterSpace5129":1, 
+        "MeowterSpace5129":1.1, 
+        "ralpmeTthginK96":0.8,
+        "MetalPipeFallingSoundFX":0.9,
+        "PinkAzimuth": 1.2,
     },
 
 
