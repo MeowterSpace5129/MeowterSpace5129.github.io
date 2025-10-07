@@ -73,7 +73,13 @@ window.addEventListener("load", (event)=>{
     old_names = localStorage.getItem("old_names") ?? old_names
     old_banned_names = localStorage.getItem("old_banned_names") ?? old_banned_names
     ban_mode = localStorage.getItem("ban_mode") ?? ban_mode
-
+    if (localStorage.getItem("recent_names") != null){
+        if (confirm("Would you like to restore names?")) {
+            names = localStorage.getItem("recent_names")
+        } else {
+            localStorage.removeItem("recent_names")
+        }
+    }
 
     var child = document.getElementById("names_section");
     child.style.paddingRight = child.offsetWidth - child.clientWidth + "px";
@@ -201,18 +207,23 @@ function appendName(name) {
                     "<div class=\"name\" id=\"name_"+name+"\">\n" +
                     "   " + name + "\n" +
                     "   <button onClick=\"removeName(&quot;"+name+"&quot;)\"> X </button>\n"+
-                    "</div>"
+                    "</div>";
+    storeNames()
                     
 }
 function removeName(name) {
     if (names.indexOf(name) == -1) {return}
     document.getElementById("name_" + name).remove();
     names.splice(names.indexOf(name),1);
+    storeNames()
 }
 function addCustomName() {
     if (document.getElementById("add_name_input").value=="") return;
     appendName(document.getElementById("add_name_input").value)
     document.getElementById("add_name_input").value = ""
+}
+function storeNames(){
+    localStorage.setItem("recent_names", names)
 }
 function start() {
     if (isRunning) return;
