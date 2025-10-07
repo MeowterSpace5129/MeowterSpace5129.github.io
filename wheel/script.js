@@ -25,7 +25,7 @@ var horses = {horses:{}
     
 }
 var list = {red_names:[]}
-var oldnames = []
+var old_names = []
 var old_banned_names = []
 var able_to_restore = false
 var has_token = false
@@ -40,7 +40,7 @@ var horse_speed = 12
 var last_horse_angle = 0
 var last_about_angle = 0
 var last_after_angle = 0
-var banmode = 0
+var ban_mode = 0
 
 var img_grid
 var img_uwu
@@ -70,6 +70,11 @@ window.addEventListener("load", (event)=>{
         document.getElementById("mode_button").style.display = "none"
         document.getElementById("ban_button").style.display = "none"
     }
+    old_names = localStorage.getItem("old_names") ?? old_names
+    old_banned_names = localStorage.getItem("old_banned_names") ?? old_banned_names
+    ban_mode = localStorage.getItem("ban_mode") ?? ban_mode
+
+
     var child = document.getElementById("names_section");
     child.style.paddingRight = child.offsetWidth - child.clientWidth + "px";
 })
@@ -218,14 +223,16 @@ function start() {
     starting = true;
 }
 function reset() {
-    oldnames = [...names]
-    oldnames.forEach(e => removeName(e))
+    old_names = [...names]
+    localStorage.setItem("old_names", old_names)
+    old_names.forEach(e => removeName(e))
     old_banned_names = [...banned_names]
+    localStorage.setItem("old_banned_names", old_banned_names)
     banned_names = []
     able_to_restore = true
 }
 function restore() {
-    oldnames.forEach(e => appendName(e))
+    old_names.forEach(e => appendName(e))
     old_banned_names.forEach(e => banned_names.push(e))
 
 }
@@ -234,19 +241,20 @@ function changeMode() {
     else wheel_mode = 0
 }
 function changeBan(){
-    banmode = ++banmode % 3
+    ban_mode = ++ban_mode % 3
+    localStorage.setItem("ban_mode", ban_mode)
 }
 function winner(name)
 {
     document.getElementById("winner_name").innerHTML = name
     document.getElementById("start_button").style.backgroundColor="transparent"
     // points night control
-    if(banmode == 0) {
+    if(ban_mode == 0) {
         banned_names.push(name)
-    } else if (banmode == 1) {
+    } else if (ban_mode == 1) {
         banned_names=[]
         banned_names.push(name)
-    } else if (banmode == 2) {
+    } else if (ban_mode == 2) {
         banned_names=[]
     }
     removeName(name)
@@ -301,11 +309,11 @@ function draw() {
         case 1: drawHorses(); break
         case 2: drawList(); break
     }
-    if (banmode == 0) {
+    if (ban_mode == 0) {
         document.getElementById("ban_mode").innerHTML = "Until Reset"
-    } else if (banmode == 1) {
+    } else if (ban_mode == 1) {
         document.getElementById("ban_mode").innerHTML = "Last Winner"
-    } else if (banmode == 2) {
+    } else if (ban_mode == 2) {
         document.getElementById("ban_mode").innerHTML = "None"
     }
 }
