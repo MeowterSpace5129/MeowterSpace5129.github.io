@@ -70,12 +70,12 @@ window.addEventListener("load", (event)=>{
         document.getElementById("mode_button").style.display = "none"
         document.getElementById("ban_button").style.display = "none"
     }
-    old_names = localStorage.getItem("old_names") ?? old_names
-    old_banned_names = localStorage.getItem("old_banned_names") ?? old_banned_names
+    old_names = JSON.parse(localStorage.getItem("old_names")) ?? old_names
+    old_banned_names = JSON.parse(localStorage.getItem("old_banned_names")) ?? old_banned_names
     ban_mode = localStorage.getItem("ban_mode") ?? ban_mode
     if (localStorage.getItem("recent_names") != null){
         if (confirm("Would you like to restore names?")) {
-            names = localStorage.getItem("recent_names")
+            names = JSON.parse(localStorage.getItem("recent_names"))
         } else {
             localStorage.removeItem("recent_names")
         }
@@ -223,7 +223,7 @@ function addCustomName() {
     document.getElementById("add_name_input").value = ""
 }
 function storeNames(){
-    localStorage.setItem("recent_names", names)
+    localStorage.setItem("recent_names", JSON.stringify(names))
 }
 function start() {
     if (isRunning) return;
@@ -235,10 +235,10 @@ function start() {
 }
 function reset() {
     old_names = [...names]
-    localStorage.setItem("old_names", old_names)
+    localStorage.setItem("old_names", JSON.stringify(old_names))
     old_names.forEach(e => removeName(e))
     old_banned_names = [...banned_names]
-    localStorage.setItem("old_banned_names", old_banned_names)
+    localStorage.setItem("old_banned_names", JSON.stringify(old_banned_names))
     banned_names = []
     able_to_restore = true
 }
