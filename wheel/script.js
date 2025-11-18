@@ -49,7 +49,6 @@ var img_ratt
 var img_tart
 
 var totalWeight = 0
-var inited = false;
 
 window.addEventListener("load", (event)=>{
     const urlParams = new URLSearchParams(window.location.hash.substring(1))
@@ -78,11 +77,9 @@ window.addEventListener("load", (event)=>{
             let new_names = JSON.parse(localStorage.getItem("recent_names"))
             for (let e of new_names) {
                 appendName(e)
-                inited = true;
             }
         } else {
             localStorage.removeItem("recent_names")
-            inited = true;
         }
     }
 
@@ -321,7 +318,6 @@ function setup() {
     ]
 }
 function draw() {
-    if (!inited) return;
     deltaTime /= 1000
     deltaTime = 1/60
     switch (wheel_mode) {
