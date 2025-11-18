@@ -32,7 +32,7 @@ main {
 #right_section {
     display: grid;
     grid-template-columns: 0.5fr 0.5fr 1fr;
-    grid-auto-rows: 1fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr 0.5fr 0.5fr;
     height: 100%;
     background-color: #393939;
     display: grid;
@@ -60,6 +60,7 @@ main {
     border-radius: 10px;
     background-color: transparent;
     border: solid 2px;
+    line-height: 0px;
 }
 #start_button {
     grid-area: 2 / 1 / 3 / 3;
@@ -73,8 +74,20 @@ main {
 #start_button:active {
     background-color: darkgreen;
 }
+#clear_button {
+    grid-area: 3 / 1 / 4 / 3;
+    border-color: rgb(0, 204, 255);
+    color:rgb(0, 204, 255);
+    width: 95%
+}
+#clear_button:hover {
+    background-color: rgb(7, 49, 77);
+}
+#clear_button:active {
+    background-color: rgb(6, 35, 59);
+}
 #reset_button {
-    grid-area: 3 / 1 / 4 / 2;
+    grid-area: 4 / 1 / 5 / 2;
     border-color: red;
     color:red;
 }
@@ -85,7 +98,7 @@ main {
     background-color: rgb(58, 10, 10);
 }
 #restore_button {
-    grid-area: 3 / 2 / 4 / 3;
+    grid-area: 4 / 2 / 5 / 3;
     border-color: yellow;
     color:yellow;
 }
@@ -96,7 +109,7 @@ main {
     background-color: rgb(61, 61, 0);
 }
 #mode_button {
-    grid-area: 4 / 1 / 5 / 2;
+    grid-area: 5 / 1 / 6 / 2;
     border-color: rgb(0, 0, 255);
     color:rgb(0, 0, 255);
 }
@@ -106,7 +119,7 @@ main {
 #mode_button:active {
     background-color: rgb(8, 8, 34);
 }#ban_button {
-    grid-area: 4 / 2 / 5 / 3;
+    grid-area: 5 / 2 / 6 / 3;
     border-color: rgb(255, 0, 255);
     color:rgb(255, 0, 255);
 }
@@ -122,6 +135,9 @@ main {
     height: 100%;
     width:100%;
 }
+#ban_mode {
+    font-size: 20px;
+}
 #generate_button:hover {
     background-color: rgb(0, 95, 95);
 }
@@ -135,7 +151,7 @@ main {
     border:0px;
 }
 #names_section {
-    grid-area: 2 / 3 / 5 / 4 ;
+    grid-area: 2 / 3 / 6 / 4 ;
     width:100%;
     height:100%;
     color:white;

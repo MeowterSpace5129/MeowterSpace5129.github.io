@@ -49,7 +49,7 @@ var img_ratt
 var img_tart
 
 var totalWeight = 0
-
+var inited = false;
 
 window.addEventListener("load", (event)=>{
     const urlParams = new URLSearchParams(window.location.hash.substring(1))
@@ -74,10 +74,15 @@ window.addEventListener("load", (event)=>{
     old_banned_names = JSON.parse(localStorage.getItem("old_banned_names")) ?? old_banned_names
     ban_mode = localStorage.getItem("ban_mode") ?? ban_mode
     if (localStorage.getItem("recent_names") != null){
-        if (confirm("Would you like to restore names?")) {
-            names = JSON.parse(localStorage.getItem("recent_names"))
+        if (confirm("Restore names?")) {
+            let new_names = JSON.parse(localStorage.getItem("recent_names"))
+            for (let e of new_names) {
+                appendName(e)
+                inited = true;
+            }
         } else {
             localStorage.removeItem("recent_names")
+            inited = true;
         }
     }
 
@@ -195,7 +200,7 @@ function appendName(name) {
     if (document.getElementById("name_" + name) != null || name == null || name=="") {
         return;
     }
-    if (colors[name] == null) {
+    if (colors[name] == null || colors[name] == undefined) {
         colorMode(HSB)
         var this_color = color(random()*360, 100, 100)
         colors[name] = ["grid", this_color, this_color]
@@ -234,12 +239,15 @@ function start() {
     starting = true;
 }
 function reset() {
-    old_names = [...names]
-    localStorage.setItem("old_names", JSON.stringify(old_names))
-    old_names.forEach(e => removeName(e))
+    clears()
     old_banned_names = [...banned_names]
     localStorage.setItem("old_banned_names", JSON.stringify(old_banned_names))
     banned_names = []
+}
+function clears() {
+    old_names = [...names]
+    localStorage.setItem("old_names", JSON.stringify(old_names))
+    old_names.forEach(e => removeName(e))
     able_to_restore = true
 }
 function restore() {
@@ -280,14 +288,14 @@ function preload()
 }
 function setup() {
     colorMode(RGB)
-    colors = {
+    Object.assign(colors, {
         "MeowterSpace5129" : ["uwu", color(255,0,255), color(128,0,128)],
         "ringtail216" : ["grid", color(200,200,190), color(20,20,20)],
         "Ziggying_" : ["grid", color(237,255,0), color(237,255,0)],
         "ralpmeTthginK96" : ["ralp", color(94, 58, 42), color(149, 130, 124)],
         "MetalPipeFallingSoundFX" : ["ratt", color(212, 44, 0), color(162, 1, 97)],
         "ufomothman" : ["tart", color(255,0,255), color(0,255,255)]
-    }
+    })
     wheel_section = document.getElementById("wheel_section")
     canvas = createCanvas(wheel_section.clientWidth, wheel_section.clientHeight + 100);
     canvas.parent(wheel_section)
@@ -313,6 +321,7 @@ function setup() {
     ]
 }
 function draw() {
+    if (!inited) return;
     deltaTime /= 1000
     deltaTime = 1/60
     switch (wheel_mode) {
@@ -329,7 +338,6 @@ function draw() {
     }
 }
 function createBackground(name){
-    
     var this_bkg_img
     if (backgrounds[name]==null) {
         var template
