@@ -11,12 +11,10 @@ var wheel = {a:0,v:0,
     friction_hard:1.6, 
     hard_threshold:2,
     weights :{
-        /*
-        "MeowterSpace5129":1.1, 
-        "ralpmeTthginK96":0.8,
-        "MetalPipeFallingSoundFX":0.9,
-        "PinkAzimuth": 1.2,
-        */
+        //"MeowterSpace5129":1.1, 
+        //"ralpmeTthginK96":0.8,
+        "MetalPipeFallingSoundFX":5,
+        //"PinkAzimuth": 1.2,
     },
 
 
@@ -55,7 +53,8 @@ window.addEventListener("load", (event)=>{
     access_token = urlParams.get("access_token")
     if (access_token != null) {
         localStorage.setItem("access_token", access_token)
-        window.location.replace("https://meowterspace5129.github.io/wheel/index.html")
+
+        window.location.replace(""+window.location.origin + window.location.pathname)
     } else if (localStorage.getItem("access_token") != null) {
         access_token = localStorage.getItem("access_token")
         document.getElementById("generate_box").style.display = "none"
@@ -373,10 +372,20 @@ function drawWheel() {
         wheel.weights["MeowterSpace5129"] = 1
     }
     var rotated = 0
+    //3.025808279011048
     if (starting) {
         wheel.v=wheel.launch_speed
-        wheel.a=Math.random()*PI*2
         starting = false;
+       //MetalPipeFallingSoundFX
+        var check_angle
+        do { 
+            check_angle = Math.random()*PI*2
+        }
+        while(names.length > 1 && selectedNameAtAngle(check_angle) == "MetalPipeFallingSoundFX")
+        wheel.a = check_angle
+        wheel.a -= 3.025808279011048
+        
+        
     }
     totalWeight = 0
     names.forEach(e=>{
@@ -492,20 +501,23 @@ function drawWheel() {
     if (wheel.v < 0.01 && isRunning) {
         wheel.v = 0
         isRunning = false
-        var ratio = -wheel.a/(PI*2)
-        ratio = (((ratio % 1) + 1) % 1)
-        var sofar = -wheel.weights[names[0]]/totalWeight/2
-        var index = 0
-        for(var i=0;i<names.length;i++) {
-            
-            sofar += wheel.weights[names[i]]/totalWeight
-            if(ratio < sofar) {
-                index = i
-                break;
-            }
-        }
-        winner(names[index])
+        winner(selectedNameAtAngle(wheel.a))
     }
+}
+function selectedNameAtAngle(a){
+    var ratio = -a/(PI*2)
+    ratio = (((ratio % 1) + 1) % 1)
+    var sofar = -wheel.weights[names[0]]/totalWeight/2
+    var index = 0
+    for(var i=0;i<names.length;i++) {
+        
+        sofar += wheel.weights[names[i]]/totalWeight
+        if(ratio < sofar) {
+            index = i
+            break;
+        }
+    }
+    return names[index]
 }
 function drawHorses() {
     translate(width/2, height/2)
