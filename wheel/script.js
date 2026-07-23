@@ -67,6 +67,7 @@ window.addEventListener("load", (event)=>{
         document.getElementById("restore_button").style.display = "none"
         document.getElementById("mode_button").style.display = "none"
         document.getElementById("ban_button").style.display = "none"
+        document.getElementById("clear_button").style.display = "none"
     }
     old_names = JSON.parse(localStorage.getItem("old_names")) ?? old_names
     old_banned_names = JSON.parse(localStorage.getItem("old_banned_names")) ?? old_banned_names
